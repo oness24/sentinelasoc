@@ -56,6 +56,11 @@ class Settings(BaseSettings):
     def db_path(self) -> Path:
         return self.project_root / "soc.duckdb"
 
+    @property
+    def memory_path(self) -> Path:
+        """Banco SQLite da aplicacao: conversas, mensagens e perfil do analista."""
+        return self.project_root / "sentinelasoc.db"
+
 
 @lru_cache
 def get_settings() -> Settings:

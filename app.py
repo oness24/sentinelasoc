@@ -7,7 +7,7 @@ de luminancia, um unico acento cromatico). Execucao: streamlit run app.py
 import streamlit as st
 
 import sentinelasoc
-from sentinelasoc import db, rag
+from sentinelasoc import db, memory, rag
 from sentinelasoc.agent import AgenteSOC
 from sentinelasoc.settings import get_settings
 
@@ -112,6 +112,13 @@ CSS = """<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400
   .side-kv .v { font-family: var(--mono); font-size: .7rem; color: var(--text-2); }
   .side-note { font-size: .72rem; color: var(--faint) !important; line-height: 1.55; margin-top: .7rem; }
   .side-note code { font-size: .68rem; color: var(--muted); }
+  .fact { font-size: .78rem; color: var(--text-2); padding: .18rem 0; line-height: 1.45; }
+  section[data-testid="stSidebar"] [data-testid="stButton"] button {
+    background: var(--surface-2); color: var(--text-2);
+    border: 1px solid var(--bd); border-radius: 6px; padding: .35rem .6rem;
+    font-size: .78rem; font-family: 'Inter', sans-serif; text-align: left; }
+  section[data-testid="stSidebar"] [data-testid="stButton"] button:hover {
+    background: var(--surface-4); border-color: rgba(255,255,255,.14); color: var(--text); }
   div[data-testid="stStatus"] { background: var(--surface);
     border: 1px solid var(--bd); border-radius: 8px;
     font-family: var(--mono); font-size: .72rem; }
@@ -131,6 +138,10 @@ if "mensagens" not in st.session_state:
     st.session_state.mensagens = []
 if "pergunta_pendente" not in st.session_state:
     st.session_state.pergunta_pendente = None
+if "conversa_id" not in st.session_state:
+    st.session_state.conversa_id = None
+if "perfil_fatos" not in st.session_state:
+    st.session_state.perfil_fatos = memory.fatos_perfil()
 
 
 @st.cache_resource(show_spinner=False)
@@ -162,11 +173,61 @@ SIDEBAR = f"""
 <div class="side-kv"><span class="k">Chunks indexados</span><span class="v">{_chunks_indexados() or "—"}</span></div>
 <div class="side-kv"><span class="k">Documentos</span><span class="v">4</span></div>
 <div class="side-kv"><span class="k">Tabelas</span><span class="v">3 relacionadas</span></div>
-<div class="side-note">Toda resposta traz rastro auditável. Logs estruturados por módulo em <code>logs/sentinelasoc.log</code>, correlacionados pelo <code>request_id</code> exibido no rastro.</div>
-<div class="side-note" style="opacity:.7">MIT License · dados sintéticos determinísticos</div>
 """
 with st.sidebar:
     st.markdown(SIDEBAR, unsafe_allow_html=True)
+
+    # ── Conversas (memoria episodica) ──
+    st.markdown('<div class="side-h">Conversas</div>', unsafe_allow_html=True)
+    if st.button("Nova conversa", key="nova_conversa", use_container_width=True):
+        st.session_state.mensagens = []
+        st.session_state.conversa_id = None
+        st.rerun()
+    for conv in memory.listar_conversas(6):
+        atual = conv["id"] == st.session_state.conversa_id
+        rotulo = f"{'· ' if not atual else '● '}{conv['titulo'][:38]}"
+        if st.button(rotulo, key=f"conv_{conv['id']}", use_container_width=True):
+            st.session_state.conversa_id = conv["id"]
+            st.session_state.mensagens = memory.carregar_mensagens(conv["id"])
+            st.rerun()
+
+    # ── Memoria semantica (transparencia) ──
+    with st.expander(f"Memória do analista ({len(st.session_state.perfil_fatos)})"):
+        if st.session_state.perfil_fatos:
+            for fato in st.session_state.perfil_fatos:
+                st.markdown(f"<div class='fact'>· {fato}</div>", unsafe_allow_html=True)
+            if st.button("Esquecer tudo", key="limpar_perfil"):
+                memory.limpar_perfil()
+                st.session_state.perfil_fatos = []
+                st.rerun()
+        else:
+            st.caption(
+                "Ainda não aprendi nada duradouro sobre você — vou captar preferências conforme conversarmos."
+            )
+
+    st.markdown(
+        "<div class='side-note'>Toda resposta traz rastro auditável. Logs por módulo em "
+        "<code>logs/sentinelasoc.log</code>, correlacionados pelo <code>request_id</code>. "
+        "Memória local (SQLite) — nenhum dado sai da máquina.</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<div class="side-note" style="opacity:.7">MIT License · dados sintéticos determinísticos</div>',
+        unsafe_allow_html=True,
+    )
+
+    if st.session_state.mensagens:
+        md = ["# Conversa — SentinelaSOC\n"]
+        for m in st.session_state.mensagens:
+            quem = "**Analista**" if m["role"] == "user" else "**SentinelaSOC**"
+            md.append(f"{quem}\n\n{m['content']}\n")
+        st.download_button(
+            "Exportar conversa (.md)",
+            data="\n".join(md),
+            file_name="conversa-sentinelasoc.md",
+            key="exportar",
+            use_container_width=True,
+        )
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Topbar / hero
@@ -249,6 +310,12 @@ def renderizar_trace(trace: list[dict]) -> None:
                         f"<div class='trace-row'><span class='k'>rag</span><span>{fonte}</span></div>",
                         unsafe_allow_html=True,
                     )
+            elif item["tipo"] == "contexto":
+                st.markdown(
+                    f"<div class='trace-row'><span class='k'>ctx</span>"
+                    f"<span>seguimento reformulado → {item['reescrita'][:100]}</span></div>",
+                    unsafe_allow_html=True,
+                )
             elif item["tipo"] == "direto":
                 st.markdown(
                     f"<div class='trace-row'><span class='k'>rota</span><span>{item['decisao']}</span></div>",
@@ -325,3 +392,16 @@ if pergunta:
             {"role": "assistant", "content": texto, "trace": agente.last_trace}
         )
         renderizar_trace(agente.last_trace)
+
+        # ── Persistencia (memoria episodica) ──
+        if st.session_state.conversa_id is None:
+            st.session_state.conversa_id = memory.nova_conversa(pergunta)
+        cid = st.session_state.conversa_id
+        memory.salvar_mensagem(cid, "user", pergunta)
+        memory.salvar_mensagem(cid, "assistant", texto, agente.last_trace)
+
+        # ── Aprendizado (memoria semantica): a cada 2 trocas ──
+        if memory.contar_trocas(cid) % 2 == 0:
+            fatos = agente.extrair_fatos(pergunta, texto)
+            if fatos and memory.atualizar_fatos(fatos):
+                st.session_state.perfil_fatos = memory.fatos_perfil()

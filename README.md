@@ -98,6 +98,21 @@ download on first question.
 | `RETRIEVAL_K` | `4` | Chunks retrieved per query |
 | `LOG_LEVEL` | `INFO` | Logging |
 
+## Memory & personalization
+
+The copilot keeps three layers of memory, all local (SQLite — `sentinelasoc.db`):
+
+| Layer | What | Where you see it |
+|---|---|---|
+| Working | last 6 turns of the current chat | conversation itself |
+| Episodic | full conversations with audit traces, resumable | sidebar "Conversas" + export to `.md` |
+| Semantic | durable facts about the analyst (role, focus areas, answer preferences), extracted every 2 exchanges, capped at 12, deduplicated | sidebar "Memória do analista" — fully visible and erasable |
+
+Follow-ups work conversationally: questions like *"e só os do Financeiro?"* are rewritten into
+standalone queries using dialog context before routing, and the SQL generator sees the
+conversation history. Rewrites appear in the audit trace (`ctx` row) and in the logs
+(`rewrite.done`).
+
 ## Evaluation (measured, not vibes)
 
 `make eval` runs a 12-question golden set of real triage questions against temporary

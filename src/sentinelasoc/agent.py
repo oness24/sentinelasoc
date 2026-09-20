@@ -14,7 +14,14 @@ from collections.abc import Iterator
 
 from sentinelasoc import db, rag
 from sentinelasoc.llm import LLMClient, OpenAILLMClient
-from sentinelasoc.prompts import FINAL_PROMPT, ROUTER_PROMPT, SQL_PROMPT, SYSTEM_PROMPT
+from sentinelasoc.prompts import (
+    FACTS_PROMPT,
+    FINAL_PROMPT,
+    REWRITE_PROMPT,
+    ROUTER_PROMPT,
+    SQL_PROMPT,
+    SYSTEM_PROMPT,
+)
 from sentinelasoc.telemetry import get_logger, request_context, timed
 
 log = get_logger(__name__)
@@ -39,7 +46,41 @@ def _historico_mensagens(history: list[dict]) -> list[dict]:
     return msgs
 
 
-def _executar_sql(pergunta: str, trace: list[dict], cliente: LLMClient) -> str:
+def _historico_texto(history: list[dict]) -> str:
+    """Historico compacto para prompts de reescrita (papel: conteudo)."""
+    linhas = []
+    for m in history[-MAX_HISTORIA:]:
+        conteudo = str(m.get("content", "")).strip()
+        if conteudo:
+            papel = "analista" if m.get("role") == "user" else "assistente"
+            linhas.append(f"{papel}: {conteudo[:300]}")
+    return "\n".join(linhas)
+
+
+def _reformular(pergunta: str, history: list[dict], cliente: LLMClient) -> str:
+    """Reescreve um seguimento em pergunta autonoma (resolve referencias)."""
+    if not history:
+        return pergunta
+    plano = extrair_json(
+        cliente.complete(
+            [
+                {
+                    "role": "system",
+                    "content": REWRITE_PROMPT.format(
+                        historico=_historico_texto(history), pergunta=pergunta
+                    ),
+                },
+                {"role": "user", "content": pergunta},
+            ],
+            temperature=0.0,
+            max_tokens=400,
+        )
+    )
+    independente = str(plano.get("pergunta_independente", pergunta)).strip()
+    return independente or pergunta
+
+
+def _executar_sql(pergunta: str, trace: list[dict], cliente: LLMClient, history: list[dict]) -> str:
     """Gera SQL via LLM, valida contra o guarda somente-leitura e executa no DuckDB.
 
     Auto-correcao: erros de execucao (coluna inexistente, sintaxe) sao devolvidos
@@ -49,6 +90,7 @@ def _executar_sql(pergunta: str, trace: list[dict], cliente: LLMClient) -> str:
 
     mensagens = [
         {"role": "system", "content": SQL_PROMPT.format(schema=db.schema_descritivo())},
+        *_historico_mensagens(history),
         {"role": "user", "content": pergunta},
     ]
     ultimo_erro: Exception | None = None
@@ -125,8 +167,17 @@ class AgenteSOC:
             self.llm = OpenAILLMClient()
         return self.llm
 
-    def answer(self, pergunta: str, history: list[dict] | None = None) -> Iterator[str]:
-        """Gerador que transmite a resposta em streaming e popula `self.last_trace`."""
+    def answer(
+        self,
+        pergunta: str,
+        history: list[dict] | None = None,
+        perfil: list[str] | None = None,
+    ) -> Iterator[str]:
+        """Gerador que transmite a resposta em streaming e popula `self.last_trace`.
+
+        `perfil` e a memoria semantica do analista (fatos duraveis), injetada na
+        resposta final para continuidade entre conversas.
+        """
         history = history or []
         self.last_trace = []
         trace = self.last_trace
@@ -136,14 +187,59 @@ class AgenteSOC:
             trace.append({"tipo": "request", "id": rid})
             log.info("request.start pergunta=%r", pergunta[:120])
             total = 0
-            for chunk in self._answer_com_contexto(pergunta, history, trace, cliente):
+            for chunk in self._answer_com_contexto(pergunta, history, trace, cliente, perfil):
                 total += len(chunk)
                 yield chunk
             log.info("request.done chars=%d", total)
 
+    def extrair_fatos(self, pergunta: str, resposta: str) -> list[str]:
+        """Extrai fatos duraveis sobre o analista de uma troca (memoria semantica)."""
+        cliente = self._cliente()
+        try:
+            plano = extrair_json(
+                cliente.complete(
+                    [
+                        {
+                            "role": "system",
+                            "content": FACTS_PROMPT.format(
+                                pergunta=pergunta[:800], resposta=resposta[:1500]
+                            ),
+                        },
+                        {"role": "user", "content": "extrair"},
+                    ],
+                    temperature=0.0,
+                    max_tokens=400,
+                )
+            )
+            fatos = [str(f).strip() for f in plano.get("fatos", []) if str(f).strip()]
+            log.info("memory.facts.extracted n=%d", len(fatos))
+            return fatos[:4]
+        except (ValueError, KeyError) as exc:
+            log.warning("memory.facts.failed erro=%s", exc)
+            return []
+
     def _answer_com_contexto(
-        self, pergunta: str, history: list[dict], trace: list[dict], cliente: LLMClient
+        self,
+        pergunta: str,
+        history: list[dict],
+        trace: list[dict],
+        cliente: LLMClient,
+        perfil: list[str] | None = None,
     ) -> Iterator[str]:
+        # 0) Seguimentos: reescreve a pergunta em forma autonoma
+        pergunta_efetiva = pergunta
+        if history:
+            with timed("reformulacao", trace):
+                try:
+                    pergunta_efetiva = _reformular(pergunta, history, cliente)
+                except (ValueError, KeyError) as exc:
+                    log.warning("rewrite.failed erro=%s", exc)
+            if pergunta_efetiva != pergunta:
+                trace.append(
+                    {"tipo": "contexto", "seguimento": True, "reescrita": pergunta_efetiva}
+                )
+                log.info("rewrite.done pergunta=%r -> %r", pergunta, pergunta_efetiva[:100])
+
         # 1) Roteamento (sem streaming, temperatura 0, JSON estrito)
         with timed("roteamento", trace):
             try:
@@ -152,7 +248,7 @@ class AgenteSOC:
                         [
                             {"role": "system", "content": ROUTER_PROMPT},
                             *_historico_mensagens(history),
-                            {"role": "user", "content": pergunta},
+                            {"role": "user", "content": pergunta_efetiva},
                         ],
                         temperature=0.0,
                     )
@@ -186,11 +282,16 @@ class AgenteSOC:
                 with timed(f"ferramenta:{tipo}", trace):
                     if tipo == "sql":
                         partes.append(
-                            _executar_sql(str(ferramenta.get("pergunta", pergunta)), trace, cliente)
+                            _executar_sql(
+                                str(ferramenta.get("pergunta", pergunta_efetiva)),
+                                trace,
+                                cliente,
+                                history,
+                            )
                         )
                     elif tipo == "rag":
                         partes.append(
-                            _executar_rag(str(ferramenta.get("consulta", pergunta)), trace)
+                            _executar_rag(str(ferramenta.get("consulta", pergunta_efetiva)), trace)
                         )
             except Exception as exc:  # falha isolada nao derruba a resposta
                 log.warning("tool.failed tipo=%s erro=%s", tipo, exc)
@@ -199,9 +300,15 @@ class AgenteSOC:
 
         contexto = "\n\n---\n\n".join(partes) if partes else "Nenhuma ferramenta retornou contexto."
 
-        # 3) Resposta final com streaming
+        # 3) Resposta final com streaming (perfil do analista = memoria de longo prazo)
+        system = SYSTEM_PROMPT
+        if perfil:
+            system += (
+                "\n\nMEMORIA DE LONGO PRAZO DO ANALISTA (aprendida em conversas anteriores):\n"
+            )
+            system += "\n".join(f"- {f}" for f in perfil[:12])
         mensagens = [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": system},
             *_historico_mensagens(history),
             {"role": "user", "content": FINAL_PROMPT.format(pergunta=pergunta, contexto=contexto)},
         ]

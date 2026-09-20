@@ -50,3 +50,27 @@ INSTRUCOES:
 - Se usou dados, resuma os numeros relevantes (nao despeje a tabela crua; destaque o que importa).
 - Se os dados/documentos nao bastarem para a pergunta, declare a limitacao e sugira o proximo passo.
 - Encerre com uma proxima acao util quando fizer sentido (ex.: "quer que eu detalhe o top 3 ativos?")."""
+
+REWRITE_PROMPT = """Voce reescreve perguntas de seguimento do analista para que fiquem independentes do historico.
+
+HISTORICO RECENTE:
+{historico}
+
+PERGUNTA ATUAL:
+{pergunta}
+
+Reescreva a pergunta atual de forma autonoma, resolvendo referencias como "ele", "esse ativo", "so os do Financeiro", "naquele mes". Nao responda a pergunta; apenas a reescreva.
+Se a pergunta ja for independente, devolva-a igual.
+Responda SOMENTE com JSON valido: {{"pergunta_independente": "..."}}"""
+
+FACTS_PROMPT = """Voce mantem a memoria de longo prazo do analista do SOC. Extraia da troca abaixo FATOS DURAVEIS sobre o analista: papel/funcao, areas de foco (ex.: DMZ, phishing), preferencias de resposta (ex.: quer respostas curtas), ambiente (turno, equipe, ferramentas que menciona).
+
+Nao extraia: conteudo puntual da pergunta, dados de incidentes, informacoes de uma unica consulta sem valor duradouro.
+
+PERGUNTA DO ANALISTA:
+{pergunta}
+
+RESPOSTA DO ASSISTENTE:
+{resposta}
+
+Responda SOMENTE com JSON valido: {{"fatos": ["fato 1", "fato 2"]}} — lista vazia se nao houver fato duravel."""

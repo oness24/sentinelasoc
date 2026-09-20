@@ -2,6 +2,8 @@
 
 import json
 
+import pytest
+
 from conftest import FakeLLM, rota_consultar
 from sentinelasoc.agent import AgenteSOC, extrair_json
 
@@ -122,6 +124,69 @@ def test_sql_autocorrige_coluna_inexistente():
     assert retries, "a tentativa falha deveria ficar no rastro como retry"
     erros_finais = [t for t in agente.last_trace if t["tipo"] == "erro"]
     assert not erros_finais  # nenhum erro terminal: a autocorrecao resolveu
+
+
+def test_seguimento_e_reformulado_em_sql():
+    """Follow-up 'e so os do Financeiro?' e reformulado antes de gerar SQL."""
+    llm = FakeLLM(
+        complete_responses=[
+            json.dumps(
+                {
+                    "pergunta_independente": "Quantos incidentes criticos abertos no departamento Financeiro?"
+                },
+                ensure_ascii=False,
+            ),
+            rota_consultar([{"tipo": "sql", "pergunta": "incidentes criticos do Financeiro"}]),
+            _resp_sql(
+                "SELECT COUNT(*) AS total FROM incidentes i JOIN ativos a USING (ativo_id) "
+                "WHERE i.severidade = 'Critica' AND i.status = 'Aberto' AND a.departamento = 'Financeiro'"
+            ),
+        ],
+        stream_chunks=["Existem 3 no Financeiro."],
+    )
+    agente = AgenteSOC(llm=llm)
+    history = [
+        {"role": "user", "content": "quantos incidentes criticos estao abertos?"},
+        {"role": "assistant", "content": "sao 14 no total"},
+    ]
+    saida = "".join(agente.answer("e so os do Financeiro?", history))
+    assert "3 no Financeiro" in saida
+    ctx = [t for t in agente.last_trace if t["tipo"] == "contexto"]
+    assert ctx and "Financeiro" in ctx[0]["reescrita"]
+    # o SQL final filtra pelo departamento reformulado
+    sql_trace = next(t for t in agente.last_trace if t["tipo"] == "sql")
+    assert "Financeiro" in sql_trace["sql"]
+
+
+def test_perfil_do_analista_injetado_na_resposta():
+    llm = FakeLLM(
+        complete_responses=[rota_consultar([{"tipo": "rag", "consulta": "politica de senhas"}])],
+        stream_chunks=["Resposta com perfil."],
+    )
+    agente = AgenteSOC(llm=llm)
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(
+            "sentinelasoc.agent.rag.retrieve",
+            lambda q, k=None: [],
+        )
+        saida = "".join(
+            agente.answer("regras de senha?", perfil=["Analista prefere respostas curtas"])
+        )
+    assert saida == "Resposta com perfil."
+    system_msg = llm.stream_calls[0][0]["content"]
+    assert "Analista prefere respostas curtas" in system_msg
+
+
+def test_extrair_fatos_parseia_e_falha_graciosamente():
+    llm = FakeLLM(
+        complete_responses=[json.dumps({"fatos": ["Atua na triagem N1", ""]}, ensure_ascii=False)]
+    )
+    agente = AgenteSOC(llm=llm)
+    assert agente.extrair_fatos("pergunta", "resposta") == ["Atua na triagem N1"]
+
+    llm_ruim = FakeLLM(complete_responses=["sem json"])
+    agente_ruim = AgenteSOC(llm=llm_ruim)
+    assert agente_ruim.extrair_fatos("p", "r") == []
 
 
 def test_rota_invalida_degrada_com_erro_rastreavel():

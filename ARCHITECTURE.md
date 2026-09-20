@@ -34,6 +34,8 @@ flowchart LR
 | 5 | **Injeção de dependência do cliente LLM** (Protocol `LLMClient`) | singleton acoplado à OpenAI | Testes unitários do agente sem rede (FakeLLM), troca de provedor por variável de ambiente |
 | 6 | **Guarda de SQL no código, não no prompt** | confiar na instrução "somente SELECT" do prompt | Prompt é sugestão; código é garantia. Validação por regex + lista de bloqueio antes de tocar o banco, com teste dedicado |
 | 7 | **Trace de execução em toda resposta** | resposta opaca | Auditoria (que ferramenta, qual SQL, quais fontes, tempos) exibida na UI e essencial para depurar respostas erradas |
+| 8 | **Memória em 3 camadas (SQLite)** | estado só em sessão; vetorstore como memória | Episódica (conversas retomáveis) + semântica (fatos do analista, com teto/dedup e visíveis/apagáveis). Local, sem serviço externo |
+| 9 | **Reescrita de seguimentos antes de rotear** | passar o histórico cru às ferramentas | Follow-ups viram perguntas autônomas (auditáveis no trace) antes de SQL/RAG — padrão consolidado de RAG conversacional |
 
 ## Modelo de dados
 

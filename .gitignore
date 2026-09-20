@@ -17,6 +17,7 @@ dist/
 # Artefatos locais regeneraveis
 chroma_db/
 soc.duckdb
+sentinelasoc.db*
 evals/chroma_tmp_*/
 
 # Streamlit
