@@ -6,8 +6,6 @@ em caixa alta com letter-spacing, botoes tateis com sombra interna e densidade d
 ferramenta profissional. Fontes auto-hospedadas (base64) — sem CDN.
 """
 
-import base64
-
 import streamlit as st
 
 import sentinelasoc
@@ -18,34 +16,6 @@ NAV = [
     ("painel", "Painel", ""),
     ("memoria", "Memória", ""),
 ]
-
-
-def _fontes_embedded() -> str:
-    """@font-face com as woff2 locais embutidas em base64 (autonomo, offline).
-
-    Apenas o subconjunto latin dos pesos essenciais (400/600 Rubik, 400 mono):
-    ~110KB embutidos — payloads maiores degradaram a renderizacao inicial.
-    """
-    import re
-    from pathlib import Path
-
-    essenciais = {"Rubik-400-latin.woff2", "Rubik-600-latin.woff2", "JetBrainsMono-400-latin.woff2"}
-    regras = []
-    for arq in sorted(essenciais):
-        caminho = Path("static/fonts") / arq
-        if not caminho.exists():
-            continue
-        m = re.match(r"(\w+)-(\d+)-latin\.woff2", arq)
-        if not m:
-            continue
-        familia, peso = m.group(1), m.group(2)
-        nome = {"Rubik": "Rubik", "JetBrainsMono": "'JetBrains Mono'"}[familia]
-        b64 = base64.b64encode(caminho.read_bytes()).decode()
-        regras.append(
-            f"@font-face {{font-family: {nome}; font-style: normal; font-weight: {peso};"
-            f" font-display: swap; src: url(data:font/woff2;base64,{b64}) format('woff2');}}"
-        )
-    return "".join(regras)
 
 
 CSS = """
@@ -75,6 +45,15 @@ CSS = """
 html, body, .stApp, .main, [class*="css"] {
   background: var(--canvas) !important; color: var(--text);
   font-family: var(--ui); letter-spacing: -0.005em;
+}
+/* Fundo Quimera: brilhos ambientes em camadas (violeta > roxo > lima) */
+.stApp, section.main {
+  background:
+    radial-gradient(1100px 520px at 88% -12%, rgba(66,32,130,.50), transparent 62%),
+    radial-gradient(900px 620px at -12% 108%, rgba(139,125,251,.13), transparent 58%),
+    radial-gradient(760px 420px at 55% 122%, rgba(194,239,78,.045), transparent 62%),
+    var(--canvas) !important;
+  background-attachment: fixed !important;
 }
 #MainMenu, footer, div[data-testid="stToolbar"] {visibility: hidden; height: 0;}
 
@@ -271,7 +250,10 @@ LOGO_SVG = """<svg width="20" height="20" viewBox="0 0 24 24" fill="none">
 
 
 def inject_css() -> None:
-    st.markdown(_fontes_embedded() + CSS, unsafe_allow_html=True)
+    """Injeta o design system. Fontes Rubik/JetBrains Mono vem do sistema
+    (instaladas em ~/.local/share/fonts) — sem payload embutido, sem vazamento
+    de data-URI no markdown."""
+    st.markdown(CSS, unsafe_allow_html=True)
 
 
 def sidebar_shell(page: str) -> None:
