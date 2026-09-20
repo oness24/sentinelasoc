@@ -1,0 +1,119 @@
+vulnerabilidade_id,ativo_id,cve,descricao,cvss,data_deteccao,status,prazo_sla_dias
+VULN-001,ATV-007,CVE-2025-22457,Buffer overflow em cliente VPN,9.4,2026-03-25,Aberta,7
+VULN-002,ATV-008,CVE-2025-1974,Insecure deserialization em microservico,9.0,2026-08-29,Corrigida,7
+VULN-003,ATV-040,CVE-2025-1974,Insecure deserialization em microservico,9.0,2026-02-24,Corrigida,7
+VULN-004,ATV-022,CVE-2025-0282,Escalada de privilegios local,7.4,2026-01-17,Aberta,14
+VULN-005,ATV-002,CVE-2024-21762,Injecao de comando no firewall VPN,8.5,2026-04-15,Em correcao,14
+VULN-006,ATV-007,CVE-2025-0282,Escalada de privilegios local,7.5,2026-02-03,Aberta,14
+VULN-007,ATV-027,CVE-2025-1974,Insecure deserialization em microservico,9.0,2026-06-13,Em correcao,7
+VULN-008,ATV-027,CVE-2025-24071,Vazamento de credenciais em arquivo de log,6.7,2026-03-10,Aberta,30
+VULN-009,ATV-011,CVE-2025-1094,Injecao de SQL em portal web externo,8.4,2026-01-01,Em correcao,14
+VULN-010,ATV-034,CVE-2025-1974,Insecure deserialization em microservico,8.5,2026-06-11,Aberta,14
+VULN-011,ATV-001,CVE-2025-0282,Escalada de privilegios local,7.4,2026-08-23,Aberta,14
+VULN-012,ATV-018,CVE-2024-21762,Injecao de comando no firewall VPN,8.5,2026-01-02,Em correcao,14
+VULN-013,ATV-002,CVE-2025-0282,Escalada de privilegios local,7.7,2026-02-01,Corrigida,14
+VULN-014,ATV-038,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.4,2026-06-26,Aberta,14
+VULN-015,ATV-002,CVE-2025-22457,Buffer overflow em cliente VPN,8.7,2026-08-23,Corrigida,14
+VULN-016,ATV-014,CVE-2025-0282,Escalada de privilegios local,7.9,2026-06-04,Corrigida,14
+VULN-017,ATV-002,CVE-2025-2183,Execucao remota de codigo no servico de autenticacao,9.8,2026-07-12,Em correcao,7
+VULN-018,ATV-001,CVE-2025-0282,Escalada de privilegios local,7.6,2026-04-14,Aberta,14
+VULN-019,ATV-018,CVE-2025-20188,Divulgacao de informacoes em API interna,5.6,2026-03-23,Em correcao,30
+VULN-020,ATV-005,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.8,2026-02-26,Em correcao,14
+VULN-021,ATV-006,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.6,2026-04-26,Corrigida,14
+VULN-022,ATV-002,CVE-2024-21762,Injecao de comando no firewall VPN,8.6,2026-04-04,Aberta,14
+VULN-023,ATV-005,CVE-2025-0282,Escalada de privilegios local,7.5,2026-05-17,Aberta,14
+VULN-024,ATV-039,CVE-2025-20188,Divulgacao de informacoes em API interna,5.4,2026-07-08,Aberta,30
+VULN-025,ATV-019,CVE-2025-22457,Buffer overflow em cliente VPN,9.4,2026-02-22,Corrigida,7
+VULN-026,ATV-004,CVE-2024-21762,Injecao de comando no firewall VPN,8.4,2026-05-27,Aberta,14
+VULN-027,ATV-031,CVE-2024-21762,Injecao de comando no firewall VPN,8.2,2026-06-22,Aberta,14
+VULN-028,ATV-012,CVE-2025-22457,Buffer overflow em cliente VPN,8.8,2026-07-14,Aberta,14
+VULN-029,ATV-036,CVE-2024-4577,Contorno de validacao em gateway de API,8.5,2026-03-30,Aberta,14
+VULN-030,ATV-004,CVE-2025-22457,Buffer overflow em cliente VPN,9.0,2026-04-01,Corrigida,7
+VULN-031,ATV-030,CVE-2025-1094,Injecao de SQL em portal web externo,8.6,2025-11-24,Aberta,14
+VULN-032,ATV-004,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.2,2026-03-06,Em correcao,14
+VULN-033,ATV-010,CVE-2024-4577,Contorno de validacao em gateway de API,8.5,2026-03-26,Em correcao,14
+VULN-034,ATV-030,CVE-2024-4577,Contorno de validacao em gateway de API,8.0,2026-06-17,Aberta,14
+VULN-035,ATV-012,CVE-2024-21762,Injecao de comando no firewall VPN,8.3,2026-09-15,Aberta,14
+VULN-036,ATV-037,CVE-2024-4577,Contorno de validacao em gateway de API,8.1,2026-08-03,Corrigida,14
+VULN-037,ATV-028,CVE-2025-20188,Divulgacao de informacoes em API interna,5.2,2026-01-16,Em correcao,30
+VULN-038,ATV-004,CVE-2024-21762,Injecao de comando no firewall VPN,8.6,2026-04-06,Aberta,14
+VULN-039,ATV-002,CVE-2025-2183,Execucao remota de codigo no servico de autenticacao,9.8,2026-05-13,Corrigida,7
+VULN-040,ATV-020,CVE-2024-4577,Contorno de validacao em gateway de API,7.8,2026-01-03,Em correcao,14
+VULN-041,ATV-001,CVE-2025-22457,Buffer overflow em cliente VPN,9.5,2026-01-27,Em correcao,7
+VULN-042,ATV-022,CVE-2025-20188,Divulgacao de informacoes em API interna,5.6,2026-07-11,Em correcao,30
+VULN-043,ATV-023,CVE-2025-0282,Escalada de privilegios local,7.5,2026-02-23,Corrigida,14
+VULN-044,ATV-003,CVE-2025-0282,Escalada de privilegios local,8.0,2026-01-02,Corrigida,14
+VULN-045,ATV-003,CVE-2025-20188,Divulgacao de informacoes em API interna,5.6,2026-05-10,Aberta,30
+VULN-046,ATV-039,CVE-2025-2183,Execucao remota de codigo no servico de autenticacao,9.8,2026-09-07,Aberta,7
+VULN-047,ATV-008,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.3,2026-07-01,Corrigida,14
+VULN-048,ATV-001,CVE-2025-22457,Buffer overflow em cliente VPN,9.0,2026-07-28,Em correcao,7
+VULN-049,ATV-003,CVE-2025-20188,Divulgacao de informacoes em API interna,5.6,2026-07-26,Aberta,30
+VULN-050,ATV-019,CVE-2025-1094,Injecao de SQL em portal web externo,8.8,2026-01-06,Corrigida,14
+VULN-051,ATV-005,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.9,2026-03-18,Aberta,14
+VULN-052,ATV-001,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.5,2026-06-03,Aberta,14
+VULN-053,ATV-016,CVE-2025-2183,Execucao remota de codigo no servico de autenticacao,9.4,2026-08-03,Aberta,7
+VULN-054,ATV-032,CVE-2024-4577,Contorno de validacao em gateway de API,8.5,2025-12-30,Corrigida,14
+VULN-055,ATV-017,CVE-2025-0282,Escalada de privilegios local,7.8,2026-04-19,Corrigida,14
+VULN-056,ATV-003,CVE-2025-2183,Execucao remota de codigo no servico de autenticacao,9.8,2026-03-17,Aberta,7
+VULN-057,ATV-008,CVE-2025-1094,Injecao de SQL em portal web externo,8.9,2026-08-25,Corrigida,14
+VULN-058,ATV-003,CVE-2024-21762,Injecao de comando no firewall VPN,8.1,2026-02-05,Aberta,14
+VULN-059,ATV-002,CVE-2024-21762,Injecao de comando no firewall VPN,8.5,2026-06-16,Corrigida,14
+VULN-060,ATV-030,CVE-2025-22457,Buffer overflow em cliente VPN,9.4,2026-01-16,Em correcao,7
+VULN-061,ATV-011,CVE-2025-1094,Injecao de SQL em portal web externo,8.3,2026-08-18,Aberta,14
+VULN-062,ATV-007,CVE-2025-20188,Divulgacao de informacoes em API interna,5.6,2026-01-13,Aberta,30
+VULN-063,ATV-012,CVE-2025-1974,Insecure deserialization em microservico,8.8,2026-03-18,Aberta,14
+VULN-064,ATV-009,CVE-2025-24071,Vazamento de credenciais em arquivo de log,6.8,2026-07-22,Aberta,30
+VULN-065,ATV-005,CVE-2025-22457,Buffer overflow em cliente VPN,9.2,2026-09-11,Em correcao,7
+VULN-066,ATV-037,CVE-2025-1974,Insecure deserialization em microservico,8.7,2026-03-28,Em correcao,14
+VULN-067,ATV-040,CVE-2025-1094,Injecao de SQL em portal web externo,8.5,2026-05-13,Em correcao,14
+VULN-068,ATV-025,CVE-2024-4577,Contorno de validacao em gateway de API,8.4,2025-12-06,Aberta,14
+VULN-069,ATV-001,CVE-2024-4577,Contorno de validacao em gateway de API,8.1,2026-01-20,Aberta,14
+VULN-070,ATV-005,CVE-2025-24071,Vazamento de credenciais em arquivo de log,6.4,2026-04-01,Aberta,30
+VULN-071,ATV-004,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.6,2026-02-23,Aberta,14
+VULN-072,ATV-008,CVE-2025-1974,Insecure deserialization em microservico,8.9,2026-01-05,Em correcao,14
+VULN-073,ATV-008,CVE-2025-2183,Execucao remota de codigo no servico de autenticacao,9.5,2026-02-18,Corrigida,7
+VULN-074,ATV-006,CVE-2025-1974,Insecure deserialization em microservico,9.3,2026-04-15,Aberta,7
+VULN-075,ATV-030,CVE-2024-21762,Injecao de comando no firewall VPN,8.1,2026-08-21,Aberta,14
+VULN-076,ATV-022,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.7,2026-01-18,Aberta,14
+VULN-077,ATV-029,CVE-2025-1094,Injecao de SQL em portal web externo,8.3,2026-05-27,Corrigida,14
+VULN-078,ATV-019,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.5,2026-07-25,Corrigida,14
+VULN-079,ATV-003,CVE-2025-20188,Divulgacao de informacoes em API interna,5.0,2026-06-09,Corrigida,30
+VULN-080,ATV-026,CVE-2025-0282,Escalada de privilegios local,7.8,2026-06-12,Aberta,14
+VULN-081,ATV-007,CVE-2025-2183,Execucao remota de codigo no servico de autenticacao,9.8,2026-07-16,Em correcao,7
+VULN-082,ATV-038,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.2,2026-01-05,Corrigida,14
+VULN-083,ATV-036,CVE-2025-20188,Divulgacao de informacoes em API interna,5.6,2026-01-13,Aberta,30
+VULN-084,ATV-012,CVE-2025-1974,Insecure deserialization em microservico,8.6,2026-07-14,Corrigida,14
+VULN-085,ATV-039,CVE-2024-21762,Injecao de comando no firewall VPN,8.2,2026-03-05,Em correcao,14
+VULN-086,ATV-016,CVE-2025-22457,Buffer overflow em cliente VPN,9.0,2026-03-26,Aberta,7
+VULN-087,ATV-009,CVE-2024-4577,Contorno de validacao em gateway de API,8.0,2025-12-29,Corrigida,14
+VULN-088,ATV-021,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.6,2026-06-07,Corrigida,14
+VULN-089,ATV-023,CVE-2024-4577,Contorno de validacao em gateway de API,8.5,2026-06-18,Em correcao,14
+VULN-090,ATV-021,CVE-2025-1094,Injecao de SQL em portal web externo,8.8,2025-12-04,Em correcao,14
+VULN-091,ATV-027,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.3,2026-02-13,Aberta,14
+VULN-092,ATV-002,CVE-2025-20188,Divulgacao de informacoes em API interna,5.0,2026-08-20,Corrigida,30
+VULN-093,ATV-011,CVE-2025-22457,Buffer overflow em cliente VPN,9.2,2026-07-05,Aberta,7
+VULN-094,ATV-019,CVE-2025-0282,Escalada de privilegios local,8.0,2026-09-01,Em correcao,14
+VULN-095,ATV-040,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.8,2025-12-04,Em correcao,14
+VULN-096,ATV-019,CVE-2025-2183,Execucao remota de codigo no servico de autenticacao,9.8,2026-03-03,Em correcao,7
+VULN-097,ATV-021,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.1,2026-05-12,Corrigida,14
+VULN-098,ATV-029,CVE-2025-0282,Escalada de privilegios local,8.1,2026-03-13,Aberta,14
+VULN-099,ATV-039,CVE-2025-0282,Escalada de privilegios local,8.0,2026-06-10,Corrigida,14
+VULN-100,ATV-002,CVE-2024-4577,Contorno de validacao em gateway de API,8.5,2025-12-28,Corrigida,14
+VULN-101,ATV-005,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.3,2026-06-27,Em correcao,14
+VULN-102,ATV-006,CVE-2025-24071,Vazamento de credenciais em arquivo de log,6.7,2026-06-30,Corrigida,30
+VULN-103,ATV-039,CVE-2025-2183,Execucao remota de codigo no servico de autenticacao,9.8,2026-04-16,Em correcao,7
+VULN-104,ATV-023,CVE-2025-1094,Injecao de SQL em portal web externo,8.8,2026-04-08,Em correcao,14
+VULN-105,ATV-034,CVE-2025-1094,Injecao de SQL em portal web externo,8.8,2026-06-28,Em correcao,14
+VULN-106,ATV-006,CVE-2024-21762,Injecao de comando no firewall VPN,8.0,2026-05-31,Aberta,14
+VULN-107,ATV-019,CVE-2025-0282,Escalada de privilegios local,8.2,2025-12-20,Em correcao,14
+VULN-108,ATV-001,CVE-2025-1094,Injecao de SQL em portal web externo,8.7,2026-02-01,Corrigida,14
+VULN-109,ATV-040,CVE-2025-0282,Escalada de privilegios local,8.2,2026-04-06,Em correcao,14
+VULN-110,ATV-008,CVE-2025-20188,Divulgacao de informacoes em API interna,5.1,2026-04-26,Corrigida,30
+VULN-111,ATV-024,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.7,2026-02-01,Em correcao,14
+VULN-112,ATV-004,CVE-2024-21762,Injecao de comando no firewall VPN,8.2,2026-07-30,Corrigida,14
+VULN-113,ATV-035,CVE-2024-38063,Corrupcao de memoria na pilha de rede,7.1,2026-08-15,Corrigida,14
+VULN-114,ATV-014,CVE-2025-20188,Divulgacao de informacoes em API interna,5.6,2026-06-04,Aberta,30
+VULN-115,ATV-028,CVE-2025-1094,Injecao de SQL em portal web externo,8.8,2026-07-01,Corrigida,14
+VULN-116,ATV-003,CVE-2025-1094,Injecao de SQL em portal web externo,8.3,2026-06-18,Aberta,14
+VULN-117,ATV-037,CVE-2025-0282,Escalada de privilegios local,8.1,2026-02-21,Em correcao,14
+VULN-118,ATV-028,CVE-2024-21762,Injecao de comando no firewall VPN,7.8,2026-07-19,Em correcao,14

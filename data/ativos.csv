@@ -1,0 +1,41 @@
+ativo_id,hostname,ip,sistema_operacional,ambiente,criticidade,departamento,responsavel,exposto_internet
+ATV-001,dmz-recu-01,200.10.21.11,Debian 12,DMZ,Media,Recursos Humanos,Camila Souza,Sim
+ATV-002,dmz-mark-02,200.10.22.12,Debian 12,DMZ,Alta,Marketing,Felipe Nogueira,Sim
+ATV-003,dmz-recu-03,200.10.23.13,Ubuntu Server 22.04 LTS,DMZ,Media,Recursos Humanos,Elisa Ramos,Sim
+ATV-004,dmz-recu-04,200.10.24.14,Ubuntu Server 22.04 LTS,DMZ,Alta,Recursos Humanos,Ana Beatriz,Sim
+ATV-005,dmz-fina-05,200.10.25.15,Debian 12,DMZ,Alta,Financeiro,Bruno Carvalho,Sim
+ATV-006,dmz-fina-06,200.10.26.16,Ubuntu Server 22.04 LTS,DMZ,Alta,Financeiro,Felipe Nogueira,Sim
+ATV-007,dmz-data-07,200.10.27.17,Debian 12,DMZ,Alta,Data & Analytics,Elisa Ramos,Sim
+ATV-008,dmz-juri-08,200.10.28.18,Debian 12,DMZ,Alta,Juridico,Felipe Nogueira,Sim
+ATV-009,data-srv-09,10.3.79.57,RHEL 9.4,Producao,Media,Data & Analytics,Ana Beatriz,Nao
+ATV-010,data-ws-10,10.3.176.156,RHEL 9.4,Producao,Media,Data & Analytics,Felipe Nogueira,Nao
+ATV-011,infr-ws-11,10.4.40.143,RHEL 9.4,Producao,Baixa,Infraestrutura,Elisa Ramos,Nao
+ATV-012,come-srv-12,10.1.23.171,Ubuntu Server 24.04 LTS,Producao,Alta,Comercial,Camila Souza,Nao
+ATV-013,recu-ws-13,10.1.194.73,Windows Server 2022,Producao,Baixa,Recursos Humanos,Camila Souza,Nao
+ATV-014,enge-ws-14,10.3.107.173,RHEL 9.4,Producao,Baixa,Engenharia,Felipe Nogueira,Nao
+ATV-015,recu-srv-15,10.2.83.120,Windows Server 2022,Producao,Media,Recursos Humanos,Felipe Nogueira,Nao
+ATV-016,mark-ws-16,10.1.117.212,Ubuntu Server 22.04 LTS,Producao,Alta,Marketing,Camila Souza,Nao
+ATV-017,data-ws-17,10.1.108.235,RHEL 9.4,Producao,Media,Data & Analytics,Felipe Nogueira,Nao
+ATV-018,infr-srv-18,10.4.73.69,Ubuntu Server 24.04 LTS,Homologacao,Media,Infraestrutura,Felipe Nogueira,Nao
+ATV-019,juri-ws-19,10.4.185.58,Ubuntu Server 24.04 LTS,Homologacao,Baixa,Juridico,Diego Fernandes,Nao
+ATV-020,recu-ws-20,10.1.78.162,Ubuntu Server 24.04 LTS,Producao,Alta,Recursos Humanos,Felipe Nogueira,Nao
+ATV-021,data-srv-21,10.4.195.154,Windows Server 2022,Producao,Baixa,Data & Analytics,Camila Souza,Nao
+ATV-022,fina-ws-22,10.3.174.30,RHEL 9.4,Producao,Media,Financeiro,Bruno Carvalho,Nao
+ATV-023,infr-ws-23,10.3.91.131,Ubuntu Server 22.04 LTS,Producao,Baixa,Infraestrutura,Camila Souza,Nao
+ATV-024,mark-srv-24,10.3.82.140,Ubuntu Server 22.04 LTS,Producao,Alta,Marketing,Elisa Ramos,Nao
+ATV-025,come-ws-25,10.1.57.239,RHEL 9.4,Homologacao,Media,Comercial,Bruno Carvalho,Nao
+ATV-026,fina-ws-26,10.1.43.189,Windows Server 2022,Producao,Media,Financeiro,Elisa Ramos,Nao
+ATV-027,enge-srv-27,10.4.84.69,Windows Server 2022,Producao,Media,Engenharia,Elisa Ramos,Nao
+ATV-028,mark-ws-28,10.4.191.114,Windows Server 2022,Producao,Alta,Marketing,Ana Beatriz,Nao
+ATV-029,mark-ws-29,10.1.173.7,Ubuntu Server 24.04 LTS,Producao,Baixa,Marketing,Bruno Carvalho,Nao
+ATV-030,fina-srv-30,10.1.117.19,Ubuntu Server 22.04 LTS,Producao,Media,Financeiro,Ana Beatriz,Nao
+ATV-031,mark-ws-31,10.4.109.140,Ubuntu Server 24.04 LTS,Producao,Baixa,Marketing,Elisa Ramos,Nao
+ATV-032,infr-ws-32,10.4.208.50,Ubuntu Server 22.04 LTS,Producao,Alta,Infraestrutura,Ana Beatriz,Nao
+ATV-033,data-srv-33,10.4.210.121,Ubuntu Server 22.04 LTS,Producao,Baixa,Data & Analytics,Felipe Nogueira,Nao
+ATV-034,recu-ws-34,10.4.173.206,Ubuntu Server 22.04 LTS,Producao,Media,Recursos Humanos,Bruno Carvalho,Nao
+ATV-035,mark-ws-35,10.2.216.48,RHEL 9.4,Homologacao,Media,Marketing,Bruno Carvalho,Nao
+ATV-036,recu-srv-36,10.1.25.168,Ubuntu Server 22.04 LTS,Homologacao,Media,Recursos Humanos,Bruno Carvalho,Nao
+ATV-037,enge-ws-37,10.4.246.56,Windows Server 2022,Homologacao,Media,Engenharia,Bruno Carvalho,Nao
+ATV-038,data-ws-38,10.4.135.239,Windows Server 2022,Producao,Media,Data & Analytics,Diego Fernandes,Nao
+ATV-039,infr-srv-39,10.2.151.57,Ubuntu Server 22.04 LTS,Producao,Baixa,Infraestrutura,Felipe Nogueira,Nao
+ATV-040,fina-ws-40,10.1.25.151,Windows Server 2022,Producao,Alta,Financeiro,Elisa Ramos,Nao

@@ -1,0 +1,357 @@
+incidente_id,ativo_id,data_abertura,tipo,severidade,tatica_mitre,status,analista_responsavel,horas_para_resolver,falso_positivo
+INC-2025-0001,ATV-032,2025-09-21,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Bruno Carvalho,0.4,Sim
+INC-2025-0002,ATV-033,2025-09-22,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Ana Beatriz,14.5,Sim
+INC-2025-0003,ATV-025,2025-09-24,Phishing,Alta,T1566 - Initial Access,Resolvido,Elisa Ramos,22.3,Nao
+INC-2025-0004,ATV-023,2025-09-24,Phishing,Media,T1566 - Initial Access,Em atendimento,Elisa Ramos,,Nao
+INC-2025-0005,ATV-004,2025-09-26,Vulnerabilidade Explorada,Media,T1190 - Exploit Public-Facing Application,Resolvido,Elisa Ramos,31.3,Nao
+INC-2025-0006,ATV-037,2025-09-28,DDoS,Alta,T1498 - Impact,Resolvido,Ana Beatriz,16.3,Nao
+INC-2025-0007,ATV-015,2025-09-28,Malware,Media,T1204 - User Execution,Resolvido,Diego Fernandes,67.9,Sim
+INC-2025-0008,ATV-005,2025-09-28,Engenharia Social,Baixa,T1598 - Phishing for Information,Resolvido,Ana Beatriz,68.8,Sim
+INC-2025-0009,ATV-015,2025-09-30,DDoS,Baixa,T1498 - Impact,Resolvido,Camila Souza,5.6,Sim
+INC-2025-0010,ATV-020,2025-10-01,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Diego Fernandes,2.9,Nao
+INC-2025-0011,ATV-018,2025-10-01,Phishing,Alta,T1566 - Initial Access,Resolvido,Ana Beatriz,27.1,Nao
+INC-2025-0012,ATV-033,2025-10-01,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Bruno Carvalho,5.7,Nao
+INC-2025-0013,ATV-039,2025-10-01,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Elisa Ramos,1.4,Nao
+INC-2025-0014,ATV-038,2025-10-02,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Elisa Ramos,14.9,Nao
+INC-2025-0015,ATV-028,2025-10-02,DDoS,Baixa,T1498 - Impact,Resolvido,Camila Souza,149.4,Sim
+INC-2025-0016,ATV-008,2025-10-06,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Diego Fernandes,95.3,Nao
+INC-2025-0017,ATV-014,2025-10-06,DDoS,Media,T1498 - Impact,Resolvido,Felipe Nogueira,21.3,Sim
+INC-2025-0018,ATV-020,2025-10-10,Forca Bruta,Alta,T1110 - Credential Access,Resolvido,Felipe Nogueira,2.8,Nao
+INC-2025-0019,ATV-036,2025-10-11,Acesso Anomalo,Alta,T1078 - Valid Accounts,Resolvido,Felipe Nogueira,19.4,Nao
+INC-2025-0020,ATV-005,2025-10-12,DDoS,Media,T1498 - Impact,Resolvido,Camila Souza,40.1,Nao
+INC-2025-0021,ATV-034,2025-10-13,Phishing,Baixa,T1566 - Initial Access,Resolvido,Bruno Carvalho,201.3,Nao
+INC-2025-0022,ATV-014,2025-10-13,DDoS,Critica,T1498 - Impact,Resolvido,Elisa Ramos,3.1,Nao
+INC-2025-0023,ATV-007,2025-10-14,Acesso Anomalo,Alta,T1078 - Valid Accounts,Em atendimento,Diego Fernandes,,Nao
+INC-2025-0024,ATV-032,2025-10-15,Exfiltracao de Dados,Media,T1041 - Exfiltration Over C2,Resolvido,Camila Souza,21.8,Nao
+INC-2025-0025,ATV-034,2025-10-16,Phishing,Alta,T1566 - Initial Access,Resolvido,Bruno Carvalho,6.6,Nao
+INC-2025-0026,ATV-002,2025-10-16,Acesso Anomalo,Alta,T1078 - Valid Accounts,Resolvido,Diego Fernandes,2.6,Nao
+INC-2025-0027,ATV-035,2025-10-16,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Diego Fernandes,5.1,Nao
+INC-2025-0028,ATV-010,2025-10-17,Malware,Media,T1204 - User Execution,Resolvido,Ana Beatriz,92.7,Nao
+INC-2025-0029,ATV-015,2025-10-19,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Elisa Ramos,0.5,Nao
+INC-2025-0030,ATV-001,2025-10-20,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Bruno Carvalho,3.8,Nao
+INC-2025-0031,ATV-031,2025-10-21,Engenharia Social,Alta,T1598 - Phishing for Information,Em atendimento,Felipe Nogueira,,Nao
+INC-2025-0032,ATV-006,2025-10-24,Acesso Anomalo,Baixa,T1078 - Valid Accounts,Resolvido,Elisa Ramos,15.8,Sim
+INC-2025-0033,ATV-008,2025-10-24,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Elisa Ramos,1.4,Nao
+INC-2025-0034,ATV-026,2025-10-24,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Ana Beatriz,4.1,Nao
+INC-2025-0035,ATV-005,2025-10-25,Engenharia Social,Baixa,T1598 - Phishing for Information,Resolvido,Felipe Nogueira,37.0,Sim
+INC-2025-0036,ATV-012,2025-10-27,Malware,Media,T1204 - User Execution,Resolvido,Diego Fernandes,77.3,Nao
+INC-2025-0037,ATV-017,2025-10-28,Vulnerabilidade Explorada,Media,T1190 - Exploit Public-Facing Application,Resolvido,Elisa Ramos,0.9,Sim
+INC-2025-0038,ATV-004,2025-10-29,Forca Bruta,Baixa,T1110 - Credential Access,Resolvido,Bruno Carvalho,37.8,Sim
+INC-2025-0039,ATV-031,2025-10-29,Phishing,Alta,T1566 - Initial Access,Resolvido,Ana Beatriz,6.2,Nao
+INC-2025-0040,ATV-028,2025-10-30,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Ana Beatriz,12.8,Sim
+INC-2025-0041,ATV-009,2025-11-02,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Felipe Nogueira,31.2,Nao
+INC-2025-0042,ATV-002,2025-11-02,Malware,Media,T1204 - User Execution,Resolvido,Elisa Ramos,21.5,Nao
+INC-2025-0043,ATV-040,2025-11-02,Acesso Anomalo,Alta,T1078 - Valid Accounts,Resolvido,Camila Souza,14.0,Nao
+INC-2025-0044,ATV-026,2025-11-02,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Felipe Nogueira,7.2,Nao
+INC-2025-0045,ATV-006,2025-11-03,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Camila Souza,5.1,Sim
+INC-2025-0046,ATV-003,2025-11-03,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Diego Fernandes,70.2,Sim
+INC-2025-0047,ATV-005,2025-11-04,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Elisa Ramos,68.9,Nao
+INC-2025-0048,ATV-002,2025-11-06,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Felipe Nogueira,3.7,Nao
+INC-2025-0049,ATV-024,2025-11-07,Phishing,Media,T1566 - Initial Access,Em atendimento,Felipe Nogueira,,Nao
+INC-2025-0050,ATV-007,2025-11-08,Malware,Media,T1204 - User Execution,Resolvido,Bruno Carvalho,13.0,Nao
+INC-2025-0051,ATV-003,2025-11-08,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Ana Beatriz,1.5,Sim
+INC-2025-0052,ATV-003,2025-11-09,Acesso Anomalo,Baixa,T1078 - Valid Accounts,Resolvido,Ana Beatriz,212.7,Nao
+INC-2025-0053,ATV-036,2025-11-10,Malware,Baixa,T1204 - User Execution,Resolvido,Diego Fernandes,90.9,Sim
+INC-2025-0054,ATV-008,2025-11-10,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Ana Beatriz,48.6,Nao
+INC-2025-0055,ATV-036,2025-11-12,Phishing,Baixa,T1566 - Initial Access,Resolvido,Felipe Nogueira,14.3,Sim
+INC-2025-0056,ATV-025,2025-11-17,DDoS,Media,T1498 - Impact,Resolvido,Diego Fernandes,11.6,Nao
+INC-2025-0057,ATV-021,2025-11-18,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Felipe Nogueira,1.5,Nao
+INC-2025-0058,ATV-007,2025-11-18,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Felipe Nogueira,6.1,Nao
+INC-2025-0059,ATV-003,2025-11-19,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Felipe Nogueira,1.9,Nao
+INC-2025-0060,ATV-013,2025-11-20,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Felipe Nogueira,53.3,Sim
+INC-2025-0061,ATV-007,2025-11-20,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Camila Souza,9.7,Nao
+INC-2025-0062,ATV-029,2025-11-22,Exfiltracao de Dados,Media,T1041 - Exfiltration Over C2,Resolvido,Felipe Nogueira,33.9,Nao
+INC-2025-0063,ATV-035,2025-11-23,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Diego Fernandes,1.5,Nao
+INC-2025-0064,ATV-036,2025-11-23,DDoS,Alta,T1498 - Impact,Resolvido,Elisa Ramos,2.2,Nao
+INC-2025-0065,ATV-007,2025-11-23,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Felipe Nogueira,1.1,Nao
+INC-2025-0066,ATV-016,2025-11-25,DDoS,Alta,T1498 - Impact,Resolvido,Felipe Nogueira,30.0,Nao
+INC-2025-0067,ATV-024,2025-11-25,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Bruno Carvalho,211.1,Sim
+INC-2025-0068,ATV-005,2025-11-26,Malware,Baixa,T1204 - User Execution,Resolvido,Felipe Nogueira,41.1,Sim
+INC-2025-0069,ATV-037,2025-11-27,DDoS,Media,T1498 - Impact,Resolvido,Elisa Ramos,31.5,Nao
+INC-2025-0070,ATV-015,2025-11-28,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Bruno Carvalho,12.9,Nao
+INC-2025-0071,ATV-007,2025-11-29,Acesso Anomalo,Alta,T1078 - Valid Accounts,Resolvido,Diego Fernandes,24.8,Sim
+INC-2025-0072,ATV-021,2025-11-30,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Camila Souza,3.1,Nao
+INC-2025-0073,ATV-001,2025-12-03,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Em atendimento,Diego Fernandes,,Nao
+INC-2025-0074,ATV-038,2025-12-10,DDoS,Critica,T1498 - Impact,Resolvido,Felipe Nogueira,20.2,Nao
+INC-2025-0075,ATV-004,2025-12-13,Malware,Baixa,T1204 - User Execution,Resolvido,Bruno Carvalho,107.8,Sim
+INC-2025-0076,ATV-005,2025-12-13,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Felipe Nogueira,15.2,Nao
+INC-2025-0077,ATV-021,2025-12-16,Engenharia Social,Critica,T1598 - Phishing for Information,Resolvido,Bruno Carvalho,15.2,Nao
+INC-2025-0078,ATV-008,2025-12-16,Malware,Baixa,T1204 - User Execution,Em atendimento,Ana Beatriz,,Sim
+INC-2025-0079,ATV-003,2025-12-17,Malware,Alta,T1204 - User Execution,Resolvido,Ana Beatriz,0.4,Nao
+INC-2025-0080,ATV-005,2025-12-18,DDoS,Alta,T1498 - Impact,Resolvido,Diego Fernandes,20.7,Nao
+INC-2025-0081,ATV-029,2025-12-20,DDoS,Alta,T1498 - Impact,Em atendimento,Bruno Carvalho,,Nao
+INC-2025-0082,ATV-002,2025-12-20,DDoS,Media,T1498 - Impact,Resolvido,Diego Fernandes,91.6,Sim
+INC-2025-0083,ATV-025,2025-12-20,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Diego Fernandes,77.2,Nao
+INC-2025-0084,ATV-008,2025-12-20,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Em atendimento,Elisa Ramos,,Nao
+INC-2025-0085,ATV-023,2025-12-20,Forca Bruta,Alta,T1110 - Credential Access,Em atendimento,Diego Fernandes,,Nao
+INC-2025-0086,ATV-001,2025-12-22,Forca Bruta,Alta,T1110 - Credential Access,Resolvido,Felipe Nogueira,6.5,Nao
+INC-2025-0087,ATV-029,2025-12-24,Forca Bruta,Baixa,T1110 - Credential Access,Resolvido,Bruno Carvalho,147.4,Sim
+INC-2025-0088,ATV-038,2025-12-24,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Ana Beatriz,32.9,Nao
+INC-2025-0089,ATV-003,2025-12-24,Forca Bruta,Baixa,T1110 - Credential Access,Em atendimento,Felipe Nogueira,,Sim
+INC-2025-0090,ATV-011,2025-12-29,DDoS,Alta,T1498 - Impact,Resolvido,Bruno Carvalho,44.5,Nao
+INC-2025-0091,ATV-002,2025-12-30,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Bruno Carvalho,42.5,Sim
+INC-2025-0092,ATV-002,2025-12-30,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Ana Beatriz,8.7,Nao
+INC-2025-0093,ATV-003,2025-12-30,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Diego Fernandes,3.4,Nao
+INC-2025-0094,ATV-007,2025-12-30,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Diego Fernandes,24.0,Nao
+INC-2025-0095,ATV-026,2025-12-31,Acesso Anomalo,Baixa,T1078 - Valid Accounts,Resolvido,Elisa Ramos,11.1,Nao
+INC-2025-0096,ATV-030,2025-12-31,Malware,Media,T1204 - User Execution,Resolvido,Camila Souza,40.2,Nao
+INC-2026-0001,ATV-032,2026-01-02,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Diego Fernandes,8.9,Nao
+INC-2026-0002,ATV-002,2026-01-03,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Bruno Carvalho,2.1,Nao
+INC-2026-0003,ATV-007,2026-01-06,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Felipe Nogueira,30.8,Nao
+INC-2026-0004,ATV-013,2026-01-06,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Elisa Ramos,9.8,Nao
+INC-2026-0005,ATV-003,2026-01-06,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Ana Beatriz,9.5,Sim
+INC-2026-0006,ATV-027,2026-01-08,Phishing,Baixa,T1566 - Initial Access,Resolvido,Bruno Carvalho,25.9,Nao
+INC-2026-0007,ATV-007,2026-01-08,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Bruno Carvalho,1.5,Nao
+INC-2026-0008,ATV-001,2026-01-10,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Camila Souza,3.0,Nao
+INC-2026-0009,ATV-002,2026-01-11,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Elisa Ramos,1.0,Nao
+INC-2026-0010,ATV-004,2026-01-11,Vulnerabilidade Explorada,Media,T1190 - Exploit Public-Facing Application,Em atendimento,Camila Souza,,Sim
+INC-2026-0011,ATV-022,2026-01-12,Exfiltracao de Dados,Media,T1041 - Exfiltration Over C2,Resolvido,Camila Souza,6.6,Nao
+INC-2026-0012,ATV-012,2026-01-12,Malware,Alta,T1204 - User Execution,Resolvido,Camila Souza,13.5,Nao
+INC-2026-0013,ATV-039,2026-01-13,DDoS,Alta,T1498 - Impact,Resolvido,Felipe Nogueira,5.7,Sim
+INC-2026-0014,ATV-024,2026-01-13,Engenharia Social,Alta,T1598 - Phishing for Information,Resolvido,Felipe Nogueira,18.5,Nao
+INC-2026-0015,ATV-008,2026-01-17,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Camila Souza,5.0,Nao
+INC-2026-0016,ATV-036,2026-01-17,DDoS,Alta,T1498 - Impact,Resolvido,Bruno Carvalho,33.6,Nao
+INC-2026-0017,ATV-031,2026-01-19,DDoS,Alta,T1498 - Impact,Resolvido,Elisa Ramos,0.5,Nao
+INC-2026-0018,ATV-001,2026-01-22,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Diego Fernandes,4.1,Nao
+INC-2026-0019,ATV-032,2026-01-22,Forca Bruta,Alta,T1110 - Credential Access,Resolvido,Camila Souza,27.3,Nao
+INC-2026-0020,ATV-022,2026-01-23,Forca Bruta,Baixa,T1110 - Credential Access,Resolvido,Felipe Nogueira,141.6,Nao
+INC-2026-0021,ATV-038,2026-01-24,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Felipe Nogueira,56.8,Nao
+INC-2026-0022,ATV-008,2026-01-24,DDoS,Media,T1498 - Impact,Resolvido,Felipe Nogueira,33.6,Sim
+INC-2026-0023,ATV-005,2026-01-24,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Ana Beatriz,68.7,Sim
+INC-2026-0024,ATV-005,2026-01-24,Phishing,Baixa,T1566 - Initial Access,Resolvido,Camila Souza,42.0,Sim
+INC-2026-0025,ATV-008,2026-01-25,DDoS,Media,T1498 - Impact,Resolvido,Camila Souza,24.5,Nao
+INC-2026-0026,ATV-002,2026-01-25,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Bruno Carvalho,24.3,Nao
+INC-2026-0027,ATV-007,2026-01-26,Malware,Alta,T1204 - User Execution,Resolvido,Camila Souza,8.5,Nao
+INC-2026-0028,ATV-006,2026-01-26,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Em atendimento,Ana Beatriz,,Nao
+INC-2026-0029,ATV-037,2026-01-26,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Bruno Carvalho,19.5,Nao
+INC-2026-0030,ATV-003,2026-01-26,Phishing,Baixa,T1566 - Initial Access,Resolvido,Ana Beatriz,128.1,Nao
+INC-2026-0031,ATV-021,2026-01-27,Malware,Baixa,T1204 - User Execution,Resolvido,Felipe Nogueira,106.4,Sim
+INC-2026-0032,ATV-005,2026-01-28,Phishing,Media,T1566 - Initial Access,Resolvido,Elisa Ramos,27.8,Sim
+INC-2026-0033,ATV-005,2026-01-29,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Felipe Nogueira,3.7,Nao
+INC-2026-0034,ATV-002,2026-01-29,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Bruno Carvalho,6.6,Nao
+INC-2026-0035,ATV-026,2026-01-30,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Bruno Carvalho,4.0,Nao
+INC-2026-0036,ATV-031,2026-01-30,Malware,Media,T1204 - User Execution,Resolvido,Diego Fernandes,28.7,Nao
+INC-2026-0037,ATV-004,2026-01-31,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Felipe Nogueira,7.1,Nao
+INC-2026-0038,ATV-011,2026-02-01,Engenharia Social,Alta,T1598 - Phishing for Information,Resolvido,Elisa Ramos,20.3,Nao
+INC-2026-0039,ATV-002,2026-02-01,Malware,Media,T1204 - User Execution,Resolvido,Bruno Carvalho,120.3,Nao
+INC-2026-0040,ATV-002,2026-02-02,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Elisa Ramos,25.2,Sim
+INC-2026-0041,ATV-037,2026-02-03,DDoS,Alta,T1498 - Impact,Resolvido,Bruno Carvalho,16.4,Nao
+INC-2026-0042,ATV-006,2026-02-03,Acesso Anomalo,Critica,T1078 - Valid Accounts,Resolvido,Ana Beatriz,2.6,Nao
+INC-2026-0043,ATV-001,2026-02-04,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Diego Fernandes,1.2,Nao
+INC-2026-0044,ATV-017,2026-02-05,Malware,Media,T1204 - User Execution,Resolvido,Felipe Nogueira,2.8,Sim
+INC-2026-0045,ATV-008,2026-02-05,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Elisa Ramos,63.9,Nao
+INC-2026-0046,ATV-016,2026-02-06,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Elisa Ramos,2.3,Nao
+INC-2026-0047,ATV-001,2026-02-07,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Elisa Ramos,0.3,Nao
+INC-2026-0048,ATV-023,2026-02-07,Forca Bruta,Baixa,T1110 - Credential Access,Resolvido,Felipe Nogueira,17.0,Nao
+INC-2026-0049,ATV-004,2026-02-07,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Em atendimento,Diego Fernandes,,Nao
+INC-2026-0050,ATV-032,2026-02-10,Forca Bruta,Baixa,T1110 - Credential Access,Resolvido,Diego Fernandes,88.5,Nao
+INC-2026-0051,ATV-002,2026-02-10,Forca Bruta,Critica,T1110 - Credential Access,Resolvido,Elisa Ramos,4.9,Nao
+INC-2026-0052,ATV-003,2026-02-10,Malware,Media,T1204 - User Execution,Resolvido,Camila Souza,26.3,Nao
+INC-2026-0053,ATV-026,2026-02-11,Acesso Anomalo,Alta,T1078 - Valid Accounts,Resolvido,Elisa Ramos,19.2,Nao
+INC-2026-0054,ATV-025,2026-02-12,Acesso Anomalo,Alta,T1078 - Valid Accounts,Resolvido,Elisa Ramos,1.2,Nao
+INC-2026-0055,ATV-006,2026-02-13,Phishing,Critica,T1566 - Initial Access,Resolvido,Ana Beatriz,3.9,Nao
+INC-2026-0056,ATV-034,2026-02-14,Acesso Anomalo,Baixa,T1078 - Valid Accounts,Resolvido,Camila Souza,43.5,Sim
+INC-2026-0057,ATV-017,2026-02-14,DDoS,Critica,T1498 - Impact,Resolvido,Bruno Carvalho,1.9,Nao
+INC-2026-0058,ATV-029,2026-02-14,DDoS,Critica,T1498 - Impact,Resolvido,Ana Beatriz,2.1,Nao
+INC-2026-0059,ATV-009,2026-02-15,Phishing,Critica,T1566 - Initial Access,Resolvido,Bruno Carvalho,10.4,Nao
+INC-2026-0060,ATV-004,2026-02-16,DDoS,Alta,T1498 - Impact,Resolvido,Elisa Ramos,0.3,Nao
+INC-2026-0061,ATV-025,2026-02-16,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Camila Souza,4.7,Sim
+INC-2026-0062,ATV-001,2026-02-17,DDoS,Media,T1498 - Impact,Resolvido,Diego Fernandes,65.2,Sim
+INC-2026-0063,ATV-005,2026-02-19,Acesso Anomalo,Alta,T1078 - Valid Accounts,Resolvido,Elisa Ramos,49.8,Nao
+INC-2026-0064,ATV-039,2026-02-19,Engenharia Social,Alta,T1598 - Phishing for Information,Resolvido,Camila Souza,7.9,Sim
+INC-2026-0065,ATV-034,2026-02-20,DDoS,Alta,T1498 - Impact,Resolvido,Bruno Carvalho,29.7,Nao
+INC-2026-0066,ATV-004,2026-02-20,Phishing,Alta,T1566 - Initial Access,Resolvido,Bruno Carvalho,2.3,Sim
+INC-2026-0067,ATV-001,2026-02-20,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Bruno Carvalho,14.1,Nao
+INC-2026-0068,ATV-007,2026-02-21,Malware,Baixa,T1204 - User Execution,Em atendimento,Bruno Carvalho,,Nao
+INC-2026-0069,ATV-019,2026-02-22,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Camila Souza,14.0,Sim
+INC-2026-0070,ATV-012,2026-02-28,Phishing,Media,T1566 - Initial Access,Resolvido,Camila Souza,74.1,Nao
+INC-2026-0071,ATV-028,2026-03-06,Forca Bruta,Baixa,T1110 - Credential Access,Resolvido,Elisa Ramos,41.2,Sim
+INC-2026-0072,ATV-026,2026-03-06,Engenharia Social,Alta,T1598 - Phishing for Information,Resolvido,Elisa Ramos,6.4,Nao
+INC-2026-0073,ATV-003,2026-03-07,DDoS,Media,T1498 - Impact,Resolvido,Elisa Ramos,18.8,Sim
+INC-2026-0074,ATV-027,2026-03-08,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Felipe Nogueira,3.0,Nao
+INC-2026-0075,ATV-005,2026-03-11,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Elisa Ramos,1.4,Nao
+INC-2026-0076,ATV-035,2026-03-14,Phishing,Media,T1566 - Initial Access,Resolvido,Ana Beatriz,13.3,Sim
+INC-2026-0077,ATV-003,2026-03-14,Engenharia Social,Alta,T1598 - Phishing for Information,Resolvido,Diego Fernandes,10.6,Nao
+INC-2026-0078,ATV-007,2026-03-14,Malware,Baixa,T1204 - User Execution,Resolvido,Diego Fernandes,22.0,Sim
+INC-2026-0079,ATV-016,2026-03-15,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Elisa Ramos,7.8,Nao
+INC-2026-0080,ATV-035,2026-03-17,DDoS,Alta,T1498 - Impact,Em atendimento,Elisa Ramos,,Nao
+INC-2026-0081,ATV-001,2026-03-18,DDoS,Media,T1498 - Impact,Resolvido,Camila Souza,52.0,Nao
+INC-2026-0082,ATV-002,2026-03-19,Phishing,Baixa,T1566 - Initial Access,Resolvido,Camila Souza,60.5,Nao
+INC-2026-0083,ATV-001,2026-03-20,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Bruno Carvalho,5.0,Nao
+INC-2026-0084,ATV-001,2026-03-20,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Camila Souza,11.7,Nao
+INC-2026-0085,ATV-004,2026-03-21,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Camila Souza,4.5,Nao
+INC-2026-0086,ATV-004,2026-03-22,Vulnerabilidade Explorada,Media,T1190 - Exploit Public-Facing Application,Em atendimento,Bruno Carvalho,,Sim
+INC-2026-0087,ATV-005,2026-03-23,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Ana Beatriz,3.9,Nao
+INC-2026-0088,ATV-002,2026-03-24,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Ana Beatriz,10.8,Nao
+INC-2026-0089,ATV-004,2026-03-25,Engenharia Social,Baixa,T1598 - Phishing for Information,Resolvido,Diego Fernandes,33.7,Sim
+INC-2026-0090,ATV-008,2026-03-26,Phishing,Media,T1566 - Initial Access,Resolvido,Ana Beatriz,37.5,Sim
+INC-2026-0091,ATV-006,2026-03-26,DDoS,Baixa,T1498 - Impact,Resolvido,Bruno Carvalho,5.9,Sim
+INC-2026-0092,ATV-007,2026-03-27,Vulnerabilidade Explorada,Media,T1190 - Exploit Public-Facing Application,Resolvido,Felipe Nogueira,12.2,Sim
+INC-2026-0093,ATV-002,2026-03-30,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Felipe Nogueira,1.1,Nao
+INC-2026-0094,ATV-022,2026-04-01,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Camila Souza,32.5,Nao
+INC-2026-0095,ATV-031,2026-04-02,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Bruno Carvalho,14.0,Nao
+INC-2026-0096,ATV-017,2026-04-03,DDoS,Media,T1498 - Impact,Em atendimento,Ana Beatriz,,Nao
+INC-2026-0097,ATV-039,2026-04-05,Malware,Baixa,T1204 - User Execution,Resolvido,Camila Souza,69.0,Sim
+INC-2026-0098,ATV-019,2026-04-05,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Camila Souza,2.1,Nao
+INC-2026-0099,ATV-037,2026-04-06,DDoS,Alta,T1498 - Impact,Resolvido,Elisa Ramos,1.7,Nao
+INC-2026-0100,ATV-003,2026-04-06,Acesso Anomalo,Alta,T1078 - Valid Accounts,Resolvido,Felipe Nogueira,9.4,Nao
+INC-2026-0101,ATV-018,2026-04-07,Malware,Baixa,T1204 - User Execution,Resolvido,Elisa Ramos,219.2,Nao
+INC-2026-0102,ATV-037,2026-04-08,DDoS,Media,T1498 - Impact,Resolvido,Camila Souza,21.6,Nao
+INC-2026-0103,ATV-003,2026-04-09,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Camila Souza,5.0,Nao
+INC-2026-0104,ATV-012,2026-04-09,Phishing,Media,T1566 - Initial Access,Resolvido,Diego Fernandes,11.9,Nao
+INC-2026-0105,ATV-014,2026-04-10,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Camila Souza,46.0,Nao
+INC-2026-0106,ATV-026,2026-04-10,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Elisa Ramos,5.3,Nao
+INC-2026-0107,ATV-002,2026-04-11,DDoS,Critica,T1498 - Impact,Resolvido,Bruno Carvalho,1.2,Nao
+INC-2026-0108,ATV-004,2026-04-12,Engenharia Social,Alta,T1598 - Phishing for Information,Resolvido,Felipe Nogueira,18.6,Nao
+INC-2026-0109,ATV-023,2026-04-14,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Felipe Nogueira,12.2,Nao
+INC-2026-0110,ATV-003,2026-04-14,Acesso Anomalo,Baixa,T1078 - Valid Accounts,Resolvido,Ana Beatriz,65.1,Sim
+INC-2026-0111,ATV-003,2026-04-14,Acesso Anomalo,Media,T1078 - Valid Accounts,Em atendimento,Camila Souza,,Nao
+INC-2026-0112,ATV-026,2026-04-14,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Ana Beatriz,2.1,Nao
+INC-2026-0113,ATV-003,2026-04-15,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Felipe Nogueira,0.0,Nao
+INC-2026-0114,ATV-008,2026-04-16,Acesso Anomalo,Baixa,T1078 - Valid Accounts,Resolvido,Diego Fernandes,77.7,Sim
+INC-2026-0115,ATV-007,2026-04-18,Acesso Anomalo,Alta,T1078 - Valid Accounts,Em atendimento,Diego Fernandes,,Nao
+INC-2026-0116,ATV-005,2026-04-19,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Camila Souza,14.2,Nao
+INC-2026-0117,ATV-021,2026-04-19,Forca Bruta,Critica,T1110 - Credential Access,Resolvido,Ana Beatriz,2.5,Sim
+INC-2026-0118,ATV-001,2026-04-20,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Felipe Nogueira,19.5,Nao
+INC-2026-0119,ATV-002,2026-04-22,Phishing,Critica,T1566 - Initial Access,Resolvido,Diego Fernandes,2.5,Nao
+INC-2026-0120,ATV-039,2026-04-23,Engenharia Social,Critica,T1598 - Phishing for Information,Resolvido,Ana Beatriz,11.8,Nao
+INC-2026-0121,ATV-001,2026-04-26,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Bruno Carvalho,8.9,Nao
+INC-2026-0122,ATV-002,2026-04-27,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Bruno Carvalho,5.5,Nao
+INC-2026-0123,ATV-005,2026-04-28,Phishing,Media,T1566 - Initial Access,Resolvido,Bruno Carvalho,38.8,Nao
+INC-2026-0124,ATV-040,2026-04-30,Malware,Critica,T1204 - User Execution,Resolvido,Bruno Carvalho,22.0,Nao
+INC-2026-0125,ATV-002,2026-05-03,Malware,Alta,T1204 - User Execution,Resolvido,Camila Souza,16.3,Nao
+INC-2026-0126,ATV-013,2026-05-05,Phishing,Alta,T1566 - Initial Access,Resolvido,Elisa Ramos,1.1,Sim
+INC-2026-0127,ATV-008,2026-05-05,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Ana Beatriz,62.3,Nao
+INC-2026-0128,ATV-004,2026-05-07,DDoS,Media,T1498 - Impact,Resolvido,Ana Beatriz,2.8,Sim
+INC-2026-0129,ATV-004,2026-05-09,Phishing,Alta,T1566 - Initial Access,Resolvido,Elisa Ramos,5.6,Nao
+INC-2026-0130,ATV-004,2026-05-10,Acesso Anomalo,Alta,T1078 - Valid Accounts,Resolvido,Ana Beatriz,4.5,Nao
+INC-2026-0131,ATV-018,2026-05-11,Malware,Baixa,T1204 - User Execution,Em atendimento,Camila Souza,,Nao
+INC-2026-0132,ATV-004,2026-05-12,Malware,Alta,T1204 - User Execution,Resolvido,Bruno Carvalho,7.9,Nao
+INC-2026-0133,ATV-039,2026-05-14,Malware,Critica,T1204 - User Execution,Resolvido,Felipe Nogueira,16.3,Nao
+INC-2026-0134,ATV-040,2026-05-15,Vulnerabilidade Explorada,Media,T1190 - Exploit Public-Facing Application,Resolvido,Felipe Nogueira,97.7,Nao
+INC-2026-0135,ATV-015,2026-05-15,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Camila Souza,2.9,Sim
+INC-2026-0136,ATV-006,2026-05-17,Forca Bruta,Alta,T1110 - Credential Access,Resolvido,Elisa Ramos,17.0,Nao
+INC-2026-0137,ATV-008,2026-05-18,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Camila Souza,9.8,Nao
+INC-2026-0138,ATV-013,2026-05-19,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Felipe Nogueira,42.2,Nao
+INC-2026-0139,ATV-007,2026-05-19,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Camila Souza,3.7,Sim
+INC-2026-0140,ATV-016,2026-05-23,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Diego Fernandes,9.0,Nao
+INC-2026-0141,ATV-031,2026-05-25,Forca Bruta,Alta,T1110 - Credential Access,Resolvido,Camila Souza,5.3,Sim
+INC-2026-0142,ATV-002,2026-05-26,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Ana Beatriz,0.4,Nao
+INC-2026-0143,ATV-001,2026-05-28,Malware,Baixa,T1204 - User Execution,Em atendimento,Ana Beatriz,,Nao
+INC-2026-0144,ATV-020,2026-05-29,Acesso Anomalo,Alta,T1078 - Valid Accounts,Resolvido,Elisa Ramos,1.7,Nao
+INC-2026-0145,ATV-005,2026-06-02,Engenharia Social,Baixa,T1598 - Phishing for Information,Resolvido,Ana Beatriz,48.7,Nao
+INC-2026-0146,ATV-002,2026-06-06,DDoS,Critica,T1498 - Impact,Resolvido,Ana Beatriz,6.7,Nao
+INC-2026-0147,ATV-008,2026-06-07,Acesso Anomalo,Alta,T1078 - Valid Accounts,Resolvido,Bruno Carvalho,3.5,Nao
+INC-2026-0148,ATV-032,2026-06-12,Malware,Baixa,T1204 - User Execution,Em atendimento,Diego Fernandes,,Sim
+INC-2026-0149,ATV-017,2026-06-13,Engenharia Social,Baixa,T1598 - Phishing for Information,Resolvido,Camila Souza,204.4,Sim
+INC-2026-0150,ATV-010,2026-06-15,Exfiltracao de Dados,Media,T1041 - Exfiltration Over C2,Resolvido,Diego Fernandes,59.7,Sim
+INC-2026-0151,ATV-025,2026-06-16,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Bruno Carvalho,13.5,Sim
+INC-2026-0152,ATV-026,2026-06-18,Phishing,Media,T1566 - Initial Access,Em atendimento,Bruno Carvalho,,Nao
+INC-2026-0153,ATV-037,2026-06-20,Phishing,Baixa,T1566 - Initial Access,Resolvido,Felipe Nogueira,63.7,Nao
+INC-2026-0154,ATV-025,2026-06-20,Malware,Baixa,T1204 - User Execution,Resolvido,Felipe Nogueira,176.6,Nao
+INC-2026-0155,ATV-016,2026-06-21,Malware,Baixa,T1204 - User Execution,Resolvido,Diego Fernandes,29.1,Nao
+INC-2026-0156,ATV-018,2026-06-22,Phishing,Media,T1566 - Initial Access,Resolvido,Elisa Ramos,7.2,Nao
+INC-2026-0157,ATV-032,2026-06-22,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Elisa Ramos,3.5,Nao
+INC-2026-0158,ATV-032,2026-06-22,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Camila Souza,34.2,Nao
+INC-2026-0159,ATV-002,2026-06-23,Engenharia Social,Baixa,T1598 - Phishing for Information,Resolvido,Camila Souza,82.5,Sim
+INC-2026-0160,ATV-004,2026-06-24,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Felipe Nogueira,17.2,Nao
+INC-2026-0161,ATV-011,2026-06-25,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Diego Fernandes,0.4,Nao
+INC-2026-0162,ATV-023,2026-06-27,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Elisa Ramos,22.9,Nao
+INC-2026-0163,ATV-005,2026-06-28,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Elisa Ramos,15.8,Nao
+INC-2026-0164,ATV-003,2026-06-28,Phishing,Media,T1566 - Initial Access,Resolvido,Camila Souza,62.2,Nao
+INC-2026-0165,ATV-016,2026-06-30,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Bruno Carvalho,27.4,Nao
+INC-2026-0166,ATV-038,2026-06-30,DDoS,Critica,T1498 - Impact,Resolvido,Felipe Nogueira,10.2,Nao
+INC-2026-0167,ATV-002,2026-07-02,Phishing,Alta,T1566 - Initial Access,Resolvido,Felipe Nogueira,4.4,Nao
+INC-2026-0168,ATV-007,2026-07-03,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Elisa Ramos,1.7,Nao
+INC-2026-0169,ATV-006,2026-07-03,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Camila Souza,3.0,Nao
+INC-2026-0170,ATV-005,2026-07-04,Phishing,Media,T1566 - Initial Access,Resolvido,Elisa Ramos,15.2,Sim
+INC-2026-0171,ATV-007,2026-07-05,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Bruno Carvalho,1.7,Nao
+INC-2026-0172,ATV-015,2026-07-06,DDoS,Critica,T1498 - Impact,Resolvido,Ana Beatriz,11.4,Nao
+INC-2026-0173,ATV-009,2026-07-07,DDoS,Media,T1498 - Impact,Resolvido,Diego Fernandes,40.6,Nao
+INC-2026-0174,ATV-002,2026-07-08,DDoS,Alta,T1498 - Impact,Resolvido,Bruno Carvalho,11.8,Nao
+INC-2026-0175,ATV-007,2026-07-09,Engenharia Social,Alta,T1598 - Phishing for Information,Resolvido,Felipe Nogueira,5.4,Nao
+INC-2026-0176,ATV-008,2026-07-10,DDoS,Alta,T1498 - Impact,Resolvido,Diego Fernandes,11.9,Nao
+INC-2026-0177,ATV-027,2026-07-10,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Diego Fernandes,45.2,Nao
+INC-2026-0178,ATV-008,2026-07-10,Forca Bruta,Alta,T1110 - Credential Access,Resolvido,Bruno Carvalho,3.5,Nao
+INC-2026-0179,ATV-031,2026-07-12,Malware,Critica,T1204 - User Execution,Resolvido,Ana Beatriz,2.1,Nao
+INC-2026-0180,ATV-002,2026-07-13,Acesso Anomalo,Critica,T1078 - Valid Accounts,Resolvido,Felipe Nogueira,1.2,Nao
+INC-2026-0181,ATV-035,2026-07-13,Engenharia Social,Baixa,T1598 - Phishing for Information,Resolvido,Bruno Carvalho,8.6,Sim
+INC-2026-0182,ATV-022,2026-07-15,DDoS,Alta,T1498 - Impact,Resolvido,Ana Beatriz,28.4,Nao
+INC-2026-0183,ATV-011,2026-07-16,Engenharia Social,Baixa,T1598 - Phishing for Information,Resolvido,Felipe Nogueira,64.5,Nao
+INC-2026-0184,ATV-007,2026-07-16,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Elisa Ramos,41.6,Nao
+INC-2026-0185,ATV-040,2026-07-16,Forca Bruta,Baixa,T1110 - Credential Access,Resolvido,Camila Souza,29.8,Nao
+INC-2026-0186,ATV-029,2026-07-17,Phishing,Critica,T1566 - Initial Access,Resolvido,Elisa Ramos,2.9,Nao
+INC-2026-0187,ATV-027,2026-07-17,Forca Bruta,Baixa,T1110 - Credential Access,Resolvido,Camila Souza,82.1,Sim
+INC-2026-0188,ATV-036,2026-07-17,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Elisa Ramos,14.3,Sim
+INC-2026-0189,ATV-030,2026-07-20,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Resolvido,Elisa Ramos,7.3,Nao
+INC-2026-0190,ATV-037,2026-07-20,Malware,Baixa,T1204 - User Execution,Resolvido,Bruno Carvalho,13.2,Nao
+INC-2026-0191,ATV-006,2026-07-21,DDoS,Media,T1498 - Impact,Resolvido,Elisa Ramos,34.7,Nao
+INC-2026-0192,ATV-009,2026-07-21,Acesso Anomalo,Alta,T1078 - Valid Accounts,Resolvido,Bruno Carvalho,18.2,Nao
+INC-2026-0193,ATV-003,2026-07-21,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Ana Beatriz,4.4,Nao
+INC-2026-0194,ATV-006,2026-07-22,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Diego Fernandes,82.5,Nao
+INC-2026-0195,ATV-036,2026-07-23,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Elisa Ramos,67.2,Nao
+INC-2026-0196,ATV-005,2026-07-23,DDoS,Critica,T1498 - Impact,Resolvido,Ana Beatriz,14.7,Nao
+INC-2026-0197,ATV-001,2026-07-24,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Ana Beatriz,8.5,Nao
+INC-2026-0198,ATV-011,2026-07-26,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Em atendimento,Diego Fernandes,,Nao
+INC-2026-0199,ATV-019,2026-07-26,Phishing,Media,T1566 - Initial Access,Resolvido,Camila Souza,52.0,Nao
+INC-2026-0200,ATV-006,2026-07-26,Forca Bruta,Media,T1110 - Credential Access,Resolvido,Ana Beatriz,37.5,Nao
+INC-2026-0201,ATV-007,2026-07-27,Malware,Baixa,T1204 - User Execution,Resolvido,Camila Souza,69.6,Sim
+INC-2026-0202,ATV-013,2026-07-27,Engenharia Social,Alta,T1598 - Phishing for Information,Resolvido,Diego Fernandes,25.8,Nao
+INC-2026-0203,ATV-001,2026-07-28,Engenharia Social,Alta,T1598 - Phishing for Information,Em atendimento,Felipe Nogueira,,Sim
+INC-2026-0204,ATV-033,2026-07-29,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Camila Souza,5.5,Nao
+INC-2026-0205,ATV-018,2026-07-30,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Felipe Nogueira,5.0,Nao
+INC-2026-0206,ATV-023,2026-07-30,Vulnerabilidade Explorada,Alta,T1190 - Exploit Public-Facing Application,Resolvido,Bruno Carvalho,19.9,Nao
+INC-2026-0207,ATV-017,2026-08-03,Phishing,Media,T1566 - Initial Access,Resolvido,Bruno Carvalho,14.6,Sim
+INC-2026-0208,ATV-029,2026-08-03,Phishing,Alta,T1566 - Initial Access,Resolvido,Camila Souza,15.3,Nao
+INC-2026-0209,ATV-001,2026-08-03,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Felipe Nogueira,17.6,Nao
+INC-2026-0210,ATV-002,2026-08-03,Phishing,Media,T1566 - Initial Access,Resolvido,Felipe Nogueira,36.5,Nao
+INC-2026-0211,ATV-029,2026-08-03,Malware,Baixa,T1204 - User Execution,Resolvido,Diego Fernandes,3.1,Sim
+INC-2026-0212,ATV-005,2026-08-04,Phishing,Alta,T1566 - Initial Access,Resolvido,Ana Beatriz,12.4,Nao
+INC-2026-0213,ATV-026,2026-08-04,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Felipe Nogueira,21.8,Nao
+INC-2026-0214,ATV-006,2026-08-04,Malware,Media,T1204 - User Execution,Em atendimento,Ana Beatriz,,Nao
+INC-2026-0215,ATV-008,2026-08-05,Acesso Anomalo,Media,T1078 - Valid Accounts,Resolvido,Ana Beatriz,18.4,Nao
+INC-2026-0216,ATV-008,2026-08-08,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Diego Fernandes,2.2,Nao
+INC-2026-0217,ATV-006,2026-08-08,Exfiltracao de Dados,Critica,T1041 - Exfiltration Over C2,Aberto,Diego Fernandes,,Nao
+INC-2026-0218,ATV-008,2026-08-09,Forca Bruta,Alta,T1110 - Credential Access,Resolvido,Elisa Ramos,13.7,Nao
+INC-2026-0219,ATV-003,2026-08-09,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Resolvido,Felipe Nogueira,8.9,Nao
+INC-2026-0220,ATV-002,2026-08-10,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Aberto,Camila Souza,,Nao
+INC-2026-0221,ATV-018,2026-08-10,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Resolvido,Bruno Carvalho,27.8,Nao
+INC-2026-0222,ATV-003,2026-08-11,Malware,Alta,T1204 - User Execution,Em atendimento,Elisa Ramos,,Nao
+INC-2026-0223,ATV-005,2026-08-11,Engenharia Social,Alta,T1598 - Phishing for Information,Aberto,Diego Fernandes,,Nao
+INC-2026-0224,ATV-012,2026-08-13,Engenharia Social,Critica,T1598 - Phishing for Information,Resolvido,Ana Beatriz,0.2,Nao
+INC-2026-0225,ATV-015,2026-08-14,Acesso Anomalo,Alta,T1078 - Valid Accounts,Em atendimento,Diego Fernandes,,Nao
+INC-2026-0226,ATV-002,2026-08-15,Malware,Media,T1204 - User Execution,Em atendimento,Ana Beatriz,,Sim
+INC-2026-0227,ATV-035,2026-08-15,Phishing,Baixa,T1566 - Initial Access,Resolvido,Bruno Carvalho,14.3,Sim
+INC-2026-0228,ATV-003,2026-08-15,Malware,Media,T1204 - User Execution,Resolvido,Felipe Nogueira,20.9,Nao
+INC-2026-0229,ATV-006,2026-08-16,Acesso Anomalo,Baixa,T1078 - Valid Accounts,Resolvido,Ana Beatriz,51.0,Nao
+INC-2026-0230,ATV-017,2026-08-16,Acesso Anomalo,Critica,T1078 - Valid Accounts,Resolvido,Elisa Ramos,11.7,Nao
+INC-2026-0231,ATV-024,2026-08-19,Acesso Anomalo,Alta,T1078 - Valid Accounts,Resolvido,Diego Fernandes,26.4,Nao
+INC-2026-0232,ATV-040,2026-08-19,Engenharia Social,Media,T1598 - Phishing for Information,Resolvido,Diego Fernandes,226.0,Nao
+INC-2026-0233,ATV-037,2026-08-19,Forca Bruta,Baixa,T1110 - Credential Access,Aberto,Elisa Ramos,,Sim
+INC-2026-0234,ATV-036,2026-08-19,Engenharia Social,Critica,T1598 - Phishing for Information,Resolvido,Elisa Ramos,6.2,Nao
+INC-2026-0235,ATV-003,2026-08-21,Engenharia Social,Media,T1598 - Phishing for Information,Aberto,Bruno Carvalho,,Nao
+INC-2026-0236,ATV-018,2026-08-23,Phishing,Media,T1566 - Initial Access,Em atendimento,Diego Fernandes,,Sim
+INC-2026-0237,ATV-007,2026-08-23,Malware,Alta,T1204 - User Execution,Resolvido,Felipe Nogueira,16.7,Nao
+INC-2026-0238,ATV-004,2026-08-25,Phishing,Media,T1566 - Initial Access,Resolvido,Ana Beatriz,29.9,Sim
+INC-2026-0239,ATV-004,2026-08-25,DDoS,Media,T1498 - Impact,Resolvido,Diego Fernandes,1.9,Nao
+INC-2026-0240,ATV-028,2026-08-26,Engenharia Social,Baixa,T1598 - Phishing for Information,Aberto,Elisa Ramos,,Nao
+INC-2026-0241,ATV-002,2026-08-27,Forca Bruta,Baixa,T1110 - Credential Access,Em atendimento,Bruno Carvalho,,Sim
+INC-2026-0242,ATV-003,2026-08-28,Engenharia Social,Media,T1598 - Phishing for Information,Em atendimento,Diego Fernandes,,Sim
+INC-2026-0243,ATV-006,2026-08-30,Malware,Alta,T1204 - User Execution,Resolvido,Bruno Carvalho,10.4,Nao
+INC-2026-0244,ATV-010,2026-09-01,Engenharia Social,Alta,T1598 - Phishing for Information,Aberto,Ana Beatriz,,Nao
+INC-2026-0245,ATV-008,2026-09-02,Malware,Media,T1204 - User Execution,Em atendimento,Diego Fernandes,,Nao
+INC-2026-0246,ATV-002,2026-09-04,Phishing,Baixa,T1566 - Initial Access,Resolvido,Bruno Carvalho,11.9,Sim
+INC-2026-0247,ATV-007,2026-09-04,Acesso Anomalo,Media,T1078 - Valid Accounts,Em atendimento,Bruno Carvalho,,Nao
+INC-2026-0248,ATV-017,2026-09-04,Malware,Baixa,T1204 - User Execution,Em atendimento,Elisa Ramos,,Nao
+INC-2026-0249,ATV-032,2026-09-05,Forca Bruta,Baixa,T1110 - Credential Access,Em atendimento,Bruno Carvalho,,Sim
+INC-2026-0250,ATV-024,2026-09-05,DDoS,Alta,T1498 - Impact,Resolvido,Bruno Carvalho,5.7,Nao
+INC-2026-0251,ATV-007,2026-09-10,Acesso Anomalo,Alta,T1078 - Valid Accounts,Aberto,Diego Fernandes,,Nao
+INC-2026-0252,ATV-002,2026-09-10,DDoS,Alta,T1498 - Impact,Aberto,Bruno Carvalho,,Nao
+INC-2026-0253,ATV-016,2026-09-11,Acesso Anomalo,Alta,T1078 - Valid Accounts,Aberto,Elisa Ramos,,Nao
+INC-2026-0254,ATV-017,2026-09-12,Malware,Media,T1204 - User Execution,Em atendimento,Bruno Carvalho,,Nao
+INC-2026-0255,ATV-001,2026-09-13,Vulnerabilidade Explorada,Critica,T1190 - Exploit Public-Facing Application,Em atendimento,Camila Souza,,Nao
+INC-2026-0256,ATV-008,2026-09-15,Phishing,Media,T1566 - Initial Access,Em atendimento,Diego Fernandes,,Nao
+INC-2026-0257,ATV-022,2026-09-16,Acesso Anomalo,Alta,T1078 - Valid Accounts,Aberto,Ana Beatriz,,Nao
+INC-2026-0258,ATV-016,2026-09-16,Malware,Baixa,T1204 - User Execution,Aberto,Felipe Nogueira,,Sim
+INC-2026-0259,ATV-026,2026-09-18,Exfiltracao de Dados,Alta,T1041 - Exfiltration Over C2,Em atendimento,Camila Souza,,Sim
+INC-2026-0260,ATV-001,2026-09-19,Acesso Anomalo,Media,T1078 - Valid Accounts,Aberto,Camila Souza,,Nao
