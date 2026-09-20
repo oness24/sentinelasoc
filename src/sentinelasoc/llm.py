@@ -24,6 +24,13 @@ class LLMClient(Protocol):
     ) -> Iterator[str]: ...
 
 
+def _sem_pensamento(texto: str) -> str:
+    """Remove blocos de raciocinio <think>...</think> (modelos de raciocinio via API)."""
+    if "</think>" in texto:
+        texto = texto.split("</think>", 1)[1]
+    return texto.strip()
+
+
 class OpenAILLMClient:
     """Cliente para qualquer provedor compativel com a API OpenAI
     (OpenAI, OpenRouter, Groq, Together, Ollama, vLLM...), com retry exponencial."""
@@ -58,10 +65,10 @@ class OpenAILLMClient:
         raise ultimo_erro  # type: ignore[misc]
 
     def complete(
-        self, messages: list[dict], temperature: float = 0.2, max_tokens: int = 900
+        self, messages: list[dict], temperature: float = 0.2, max_tokens: int = 1500
     ) -> str:
         resp = self._call_with_retries(messages, temperature, max_tokens, stream=False)
-        return resp.choices[0].message.content or ""
+        return _sem_pensamento(resp.choices[0].message.content or "")
 
     def stream(
         self, messages: list[dict], temperature: float = 0.3, max_tokens: int = 1200

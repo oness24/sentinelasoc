@@ -107,7 +107,6 @@ class AgenteSOC:
                             {"role": "user", "content": pergunta},
                         ],
                         temperature=0.0,
-                        max_tokens=300,
                     )
                 )
             except (ValueError, KeyError) as exc:
