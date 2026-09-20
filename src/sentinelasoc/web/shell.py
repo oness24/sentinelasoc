@@ -251,6 +251,49 @@ a {color: var(--ouro-hover);}
   color: var(--text-3) !important;}
 [data-testid="stMetricValue"] {font-weight: 600 !important; color: var(--text) !important;}
 [data-testid="stStatusWidget"] {display: none;}
+/* Scrollbars finas escuras */
+*::-webkit-scrollbar {width: 9px; height: 9px;}
+*::-webkit-scrollbar-track {background: transparent;}
+*::-webkit-scrollbar-thumb {background: #2b2415; border-radius: 8px; border: 2px solid #07050a;}
+*::-webkit-scrollbar-thumb:hover {background: #443821;}
+html {scrollbar-color: #2b2415 #07050a; scrollbar-width: thin;}
+::selection {background: rgba(245,184,0,.30); color: #fff;}
+@keyframes msg-in {from {opacity: 0; transform: translateY(6px);} to {opacity: 1; transform: none;}}
+[data-testid="stChatMessage"] {animation: msg-in .26s ease both;}
+[data-testid="stChatMessage"] h1, [data-testid="stChatMessage"] h2,
+[data-testid="stChatMessage"] h3, [data-testid="stChatMessage"] h4 {
+  font-size: 14.5px; font-weight: 600; margin: 14px 0 6px; color: var(--text);}
+[data-testid="stChatMessage"] ul, [data-testid="stChatMessage"] ol {
+  padding-left: 20px; margin: 8px 0;}
+[data-testid="stChatMessage"] li {margin: 3px 0;}
+[data-testid="stChatMessage"] blockquote {
+  border-left: 2px solid var(--bd-strong); color: var(--text-2);
+  padding: 2px 0 2px 12px; margin: 8px 0;}
+[data-testid="stChatMessage"] hr {border: none; border-top: 1px solid var(--bd); margin: 14px 0;}
+[data-testid="stChatMessage"] strong {color: var(--text); font-weight: 600;}
+div[data-testid="stChatInput"] {
+  background: #0d0a12; border: 1px solid var(--bd-strong); border-radius: 12px;
+  padding: 6px 8px 6px 14px; box-shadow: 0 10px 28px -14px rgba(0,0,0,.65);
+  transition: border-color .15s ease, box-shadow .15s ease;}
+div[data-testid="stChatInput"]:focus-within {
+  border-color: rgba(245,184,0,.5);
+  box-shadow: 0 0 0 3px rgba(245,184,0,.07), 0 10px 28px -14px rgba(0,0,0,.65);}
+[data-testid="stChatInput"] textarea, div[data-testid="stChatInput"] textarea {
+  border: none !important; background: transparent !important;
+  box-shadow: none !important; padding: 8px 0 !important;}
+div[data-testid="stChatInput"] button {
+  background: var(--ouro) !important; color: #191204 !important;
+  border: none !important; border-radius: 8px !important; padding: 6px 10px !important;}
+div[data-testid="stChatInput"] button:hover {background: var(--ouro-hover) !important;}
+.composer-hint {
+  text-align: center; font-family: var(--mono); font-size: 10px;
+  color: var(--text-3); letter-spacing: .08em; margin-top: 8px; text-transform: uppercase;}
+[data-testid="stStatus"] {
+  background: var(--surface-1) !important; border: 1px solid var(--bd) !important;
+  border-radius: 9px !important;}
+.hero-mark {margin-bottom: 18px;
+  filter: drop-shadow(0 0 26px rgba(245,184,0,.28));}
+.hero-mark svg {display: block;}
 </style>
 """
 
@@ -324,6 +367,23 @@ def sidebar_shell(page: str) -> None:
         f"<span class='v'>{len(memory.fatos_perfil())}</span></div>",
         unsafe_allow_html=True,
     )
+    from sentinelasoc import memory as _mem
+
+    recentes = _mem.listar_conversas(3)
+    if recentes:
+        st.markdown("<div class='side-h microlabel'>Recentes</div>", unsafe_allow_html=True)
+        for conv in recentes:
+            atual = conv["id"] == st.session_state.get("conversa_id")
+            if st.button(
+                (conv["titulo"][:34] + ("…" if len(conv["titulo"]) > 34 else "")),
+                key=f"rec_{conv['id']}",
+                use_container_width=True,
+                type="primary" if atual else "secondary",
+            ):
+                st.session_state["conversa_id"] = conv["id"]
+                st.session_state["mensagens"] = _mem.carregar_mensagens(conv["id"])
+                st.query_params["page"] = "copiloto"
+                st.rerun()
     st.markdown(
         "<div class='side-note'>Execução 100% local · memória em SQLite · "
         "logs por request_id em <code>logs/</code></div>",

@@ -95,7 +95,13 @@ def render() -> None:
     # ── Estado vazio: hero + sugestoes ──
     if not st.session_state.mensagens and not st.session_state.pergunta_pendente:
         st.markdown(
-            "<div class='hero'><div class='microlabel' style='color:#f5b800'>"
+            "<div class='hero'><div class='hero-mark'>"
+            "<svg width='44' height='44' viewBox='0 0 24 24' fill='none'>"
+            "<circle cx='12' cy='12' r='11' fill='#f5b800' opacity='.08'/>"
+            "<path d='M12 1.5 Q13.9 10.1 22.5 12 Q13.9 13.9 12 22.5 Q10.1 13.9 1.5 12 "
+            "Q10.1 10.1 12 1.5 Z' fill='#f5b800'/>"
+            "<circle cx='12' cy='12' r='1.7' fill='#fff3c4'/></svg></div>"
+            "<div class='microlabel' style='color:#f5b800'>"
             "Copiloto de segurança · 100% local</div>"
             "<h1>Pergunte. O SOC responde com dados e fontes.</h1>"
             "<p>Incidentes, ativos, vulnerabilidades, playbooks e políticas — em linguagem "
@@ -194,6 +200,11 @@ def render() -> None:
     if nova:
         st.session_state.pergunta_pendente = nova
         st.rerun()
+    if st.session_state.mensagens:
+        st.markdown(
+            "<div class='composer-hint'>Enter envia · dados e fontes sempre citados</div>",
+            unsafe_allow_html=True,
+        )
 
 
 def _botao_nova_conversa() -> None:
