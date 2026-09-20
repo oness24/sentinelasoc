@@ -11,9 +11,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from sentinelasoc.agent import AgenteSOC  # noqa: E402
-from sentinelasoc.llm import OpenAILLMClient  # noqa: E402
-from sentinelasoc.settings import get_settings  # noqa: E402
+from sentinelasoc.agent import AgenteSOC
+from sentinelasoc.llm import OpenAILLMClient
+from sentinelasoc.settings import get_settings
 
 PERGUNTAS = [
     "Qual o prazo para comunicar a ANPD em um incidente com dados pessoais?",
@@ -40,7 +40,7 @@ def main() -> None:
             resposta = f"ERRO: {exc}"
         duracao = time.perf_counter() - inicio
         print(resposta[:1200])
-        print(f"\n[trace] " + " | ".join(
+        print("\n[trace] " + " | ".join(
             f"{t['tipo']}" + (f":{t.get('linhas', '')}linhas" if t["tipo"] == "sql" else "")
             for t in agente.last_trace
         ))
