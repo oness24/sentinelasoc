@@ -36,6 +36,7 @@ flowchart LR
 | 7 | **Trace de execução em toda resposta** | resposta opaca | Auditoria (que ferramenta, qual SQL, quais fontes, tempos) exibida na UI e essencial para depurar respostas erradas |
 | 8 | **Memória em 3 camadas (SQLite)** | estado só em sessão; vetorstore como memória | Episódica (conversas retomáveis) + semântica (fatos do analista, com teto/dedup e visíveis/apagáveis). Local, sem serviço externo |
 | 9 | **Reescrita de seguimentos antes de rotear** | passar o histórico cru às ferramentas | Follow-ups viram perguntas autônomas (auditáveis no trace) antes de SQL/RAG — padrão consolidado de RAG conversacional |
+| 10 | **Recuperação híbrida (vetores + BM25, fusão RRF)** | apenas vetores | Embeddings borram identificadores exatos (T1566, '15/2024', KEV); BM25 cobre o léxico e a fusão reciprocal rank soma os dois (hit@1 93%→100% no golden ampliado). Índice lazy espelhado do ChromaDB, degradação graciosa |
 
 ## Modelo de dados
 

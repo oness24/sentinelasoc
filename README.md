@@ -127,6 +127,21 @@ The default model was chosen by this benchmark — smaller, faster and more accu
 the golden set. Both reach 100% hit@3, and production retrieves top-4, so the correct
 chunk always reaches the LLM context.
 
+### Hybrid retrieval (vectors + BM25)
+
+Dense embeddings blur exact identifiers (ATT&CK technique IDs, `15/2024`, "KEV").
+Production retrieval fuses vector search with a BM25 index over the same chunks via
+reciprocal rank fusion. Measured on the 15-case golden set (12 semantic + 3 identifier
+questions):
+
+| Retrieval | hit@1 | hit@3 |
+|---|---|---|
+| Vector only | 93% | 100% |
+| **Hybrid (RRF) — production** | **100%** | 100% |
+
+BM25 index is built lazily from the ChromaDB collection (invalidated on re-ingest) and
+degrades gracefully to vector-only if unavailable.
+
 ### End-to-end (final answers, LLM-as-judge)
 
 `python evals/evaluate_e2e.py --runs 3` runs the **full agent** (routing → tools → answer)

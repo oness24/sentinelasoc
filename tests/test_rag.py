@@ -28,8 +28,18 @@ def test_colecao_populada():
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("consulta,fonte_esperada", CASOS)
-def test_recuperacao_hit_no_top3(consulta, fonte_esperada):
+@pytest.mark.parametrize(
+    "consulta,doc_esperado",
+    [
+        ("como responder a um incidente com a tecnica T1110?", "playbook_resposta_incidentes.md"),
+        ("playbook para o indicador T1041", "playbook_resposta_incidentes.md"),
+        ("o que e KEV na priorizacao de correcao?", "guia_gestao_vulnerabilidades.md"),
+        ("Resolucao CD/ANPD 15/2024", "playbook_resposta_incidentes.md"),
+    ],
+)
+def test_hibrido_acerta_identificadores_exatos(consulta, doc_esperado):
+    """Identificadores exatos (T1110, KEV, 15/2024) sao forca do BM25 na fusao."""
     chunks = retrieve(consulta, k=3)
     fontes = [c["fonte"] for c in chunks]
-    assert fonte_esperada in fontes, f"{fonte_esperada} ausente de {fontes}"
+    assert doc_esperado in fontes, f"{doc_esperado} ausente de {fontes}"
+    assert chunks[0]["texto"], "chunks hibridos devem trazer o texto do documento"

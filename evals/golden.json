@@ -12,6 +12,9 @@
     {"id": "mfa", "pergunta": "para quais acessos o MFA e obrigatorio?", "doc": "politica_de_seguranca.md"},
     {"id": "ciso", "pergunta": "em quanto tempo o CISO deve ser comunicado em incidente critico?", "doc": "playbook_resposta_incidentes.md"},
     {"id": "janela", "pergunta": "qual a janela de correcao em producao?", "doc": "guia_gestao_vulnerabilidades.md"},
-    {"id": "fp", "pergunta": "como decido entre falso positivo e incidente verdadeiro?", "doc": "faq_triagem.md"}
+    {"id": "fp", "pergunta": "como decido entre falso positivo e incidente verdadeiro?", "doc": "faq_triagem.md"},
+    {"id": "attck_t1110", "pergunta": "como responder a um incidente com a tecnica T1110?", "doc": "playbook_resposta_incidentes.md"},
+    {"id": "attck_t1041", "pergunta": "playbook para o indicador T1041", "doc": "playbook_resposta_incidentes.md"},
+    {"id": "kev", "pergunta": "o que e KEV na priorizacao de correcao?", "doc": "guia_gestao_vulnerabilidades.md"}
   ]
 }

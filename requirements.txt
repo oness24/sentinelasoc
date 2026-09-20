@@ -4,6 +4,7 @@ streamlit>=1.36
 duckdb>=1.0
 chromadb>=0.5
 sentence-transformers>=3.0
+rank-bm25>=0.9
 openai>=1.30
 python-dotenv>=1.0
 pydantic>=2.7
