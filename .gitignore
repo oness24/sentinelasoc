@@ -1,0 +1,28 @@
+# Segredos - NUNCA commitar
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+dist/
+*.egg-info/
+
+# Qualidade / caches
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+
+# Artefatos locais regeneraveis
+chroma_db/
+soc.duckdb
+evals/chroma_tmp_*/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Sistema/IDE
+.DS_Store
+.idea/
+.vscode/

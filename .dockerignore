@@ -1,0 +1,16 @@
+venv/
+.git/
+.github/
+.pre-commit-config.yaml
+chroma_db/
+soc.duckdb
+.env
+__pycache__/
+*.pyc
+*.egg-info/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+tests/
+evals/
+docs/assets/
