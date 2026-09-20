@@ -1,0 +1,17 @@
+{
+  "descricao": "Golden set de avaliacao do pipeline RAG do SentinelaSOC. Cada caso: pergunta real de analista + documento que DEVE conter a resposta (top-k).",
+  "casos": [
+    {"id": "anpd", "pergunta": "qual o prazo para comunicar a ANPD em incidente com dados pessoais?", "doc": "playbook_resposta_incidentes.md"},
+    {"id": "senha", "pergunta": "quantos caracteres deve ter uma senha e com quais requisitos?", "doc": "politica_de_seguranca.md"},
+    {"id": "primeiro_passo", "pergunta": "qual o primeiro passo ao receber um alerta?", "doc": "faq_triagem.md"},
+    {"id": "sla_critica", "pergunta": "qual o SLA para corrigir vulnerabilidade critica?", "doc": "guia_gestao_vulnerabilidades.md"},
+    {"id": "ransomware", "pergunta": "como responder a um incidente de ransomware?", "doc": "playbook_resposta_incidentes.md"},
+    {"id": "pen_drive", "pergunta": "posso usar pen drive na empresa?", "doc": "politica_de_seguranca.md"},
+    {"id": "excecao_sla", "pergunta": "quem aprova excecao ao SLA de correcao de vulnerabilidade?", "doc": "guia_gestao_vulnerabilidades.md"},
+    {"id": "phishing_sem_clique", "pergunta": "phishing sem clique em anexo: qual severidade inicial?", "doc": "playbook_resposta_incidentes.md"},
+    {"id": "mfa", "pergunta": "para quais acessos o MFA e obrigatorio?", "doc": "politica_de_seguranca.md"},
+    {"id": "ciso", "pergunta": "em quanto tempo o CISO deve ser comunicado em incidente critico?", "doc": "playbook_resposta_incidentes.md"},
+    {"id": "janela", "pergunta": "qual a janela de correcao em producao?", "doc": "guia_gestao_vulnerabilidades.md"},
+    {"id": "fp", "pergunta": "como decido entre falso positivo e incidente verdadeiro?", "doc": "faq_triagem.md"}
+  ]
+}
