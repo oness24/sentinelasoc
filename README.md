@@ -7,7 +7,7 @@ with an auditable tool trace on every response.
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![CI](https://github.com/USERNAME/sentinelasoc/actions/workflows/ci.yml/badge.svg)](https://github.com/USERNAME/sentinelasoc/actions/workflows/ci.yml)
+[![CI](https://github.com/oness24/sentinelasoc/actions/workflows/ci.yml/badge.svg)](https://github.com/oness24/sentinelasoc/actions/workflows/ci.yml)
 
 > Interface em português do Brasil; código e documentação técnica em inglês/português.
 
@@ -67,7 +67,7 @@ speaks the OpenAI protocol).
 ### Local
 
 ```bash
-git clone https://github.com/USERNAME/sentinelasoc && cd sentinelasoc
+git clone https://github.com/oness24/sentinelasoc && cd sentinelasoc
 make install                # venv + deps (CPU torch)
 cp .env.example .env        # defaults point to a local Ollama instance
 ollama pull qwen2.5:7b        # any chat model works — see `ollama list`

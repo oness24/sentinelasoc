@@ -40,7 +40,7 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/USERNAME/sentinelasoc"
+Homepage = "https://github.com/oness24/sentinelasoc"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/sentinelasoc"]
