@@ -204,7 +204,12 @@ def dividir_secoes(texto: str) -> list[tuple[str, str]]:
 
 
 def dividir_chunk_longo(texto: str, tamanho: int, sobreposicao: int) -> list[str]:
-    """Quebra secoes muito longas em blocos menores com sobreposicao."""
+    """Quebra secoes muito longas em blocos menores com sobreposicao.
+
+    Bug historico: quando o bloco final atingia o fim do texto, o avanco
+    `fim - sobreposicao` voltava atras e reemitia o trecho final dezenas de
+    vezes. O laco agora termina ao alcancar o fim.
+    """
     if len(texto) <= tamanho + 200:
         return [texto]
     blocos, inicio = [], 0
@@ -214,7 +219,11 @@ def dividir_chunk_longo(texto: str, tamanho: int, sobreposicao: int) -> list[str
             corte = texto.rfind("\n", inicio + tamanho // 2, fim)
             if corte > inicio:
                 fim = corte
-        blocos.append(texto[inicio:fim].strip())
+        bloco = texto[inicio:fim].strip()
+        if bloco:
+            blocos.append(bloco)
+        if fim >= len(texto):
+            break
         inicio = max(fim - sobreposicao, inicio + 1)
     return blocos
 

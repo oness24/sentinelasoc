@@ -50,3 +50,15 @@ O comitê mensal de segurança acompanha: total de vulnerabilidades abertas por 
 ## 8. Integração com o SOC
 
 Vulnerabilidades com CVSS 9+ em ativos expostos são notificadas automaticamente ao SOC, que monitora os logs desses ativos por 14 dias em busca de tentativas de exploração. Um incidente do tipo "Vulnerabilidade Explorada" só é aberto com evidência de exploração, não pela mera existência da falha.
+
+## 9. Rotina de remediação passo a passo
+
+Ao receber uma vulnerabilidade para corrigir (ex.: OpenSSH, serviço web, biblioteca de sistema):
+
+1. **Classifique** pela severidade do CVSS: 9.0+ Crítica, 7.0–8.9 Alta, 4.0–6.9 Média, até 3.9 Baixa (seção 3).
+2. **Priorize** considerando exposição do ativo à internet (DMZ primeiro), criticidade para o negócio, exploração ativa conhecida (KEV/PoC) e idade da falha (seção 4).
+3. **Confirme o SLA**: Crítica 7 dias; Alta 14 dias; Média 30 dias; Baixa 90 dias. Exceção exige risco aceito formal com compensação de controle e assinatura do dono do ativo e do CISO (seção 3).
+4. **Agende a janela**: produção nas terças-feiras das 22h às 2h (aprovação da mudança até segunda-feira ao meio-dia); DMZ e serviços expostos têm janela diária de 30 minutos para correções críticas, com 4 horas de antecedência; homologação livre em horário comercial (seção 5).
+5. **Aplique a correção do fornecedor** — atualize o componente (ex.: OpenSSH) para a versão com o patch do fabricante/distribuidor. Mitigações parciais (regra de bloqueio virtual, isolamento, desativação do recurso vulnerável) mantêm a vulnerabilidade em "Em correção" até a solução definitiva.
+6. **Verifique e feche**: nova varredura confirmando a remediação em até 3 dias; somente com essa evidência o status muda para "Corrigida" (seção 6).
+7. **Somente se houver evidência de exploração** (tráfego anômalo, payload, exploit em log): deixe de ser gestão de vulnerabilidade e acione o playbook de resposta a incidentes, abrindo incidente do tipo "Vulnerabilidade Explorada" e escalando conforme a severidade (seção 8).

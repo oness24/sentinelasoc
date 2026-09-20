@@ -268,6 +268,19 @@ def test_normalizar_literais_respeita_escopo_por_tabela():
     assert "'Sim'" in normalizar_literais(sql3)
 
 
+def test_dividir_chunk_longo_sem_cauda_duplicada():
+    from sentinelasoc.rag import dividir_chunk_longo
+
+    # secao longa (parametro 300/60): blocos finitos, sem reemissao do final
+    texto = "\n".join(f"linha {i} " + "x" * 40 for i in range(40))  # ~2000 chars
+    blocos = dividir_chunk_longo(texto, 300, 60)
+    assert 3 <= len(blocos) <= 12, f"esperado poucos blocos, veio {len(blocos)}"
+    assert all(b.strip() for b in blocos)
+    assert "".join(blocos)  # conteudo presente
+    # regressao do bug: bloco final nao pode repetir dezenas de vezes
+    assert not any(blocos.count(b) > 2 for b in set(blocos))
+
+
 def test_rota_invalida_degrada_com_erro_rastreavel():
     llm = FakeLLM(
         complete_responses=["resposta completamente fora de formato"],
