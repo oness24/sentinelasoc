@@ -80,6 +80,9 @@ DICAS IMPORTANTES:
 - Taxas/percentuais de um subgrupo: o DENOMINADOR deve ter o MESMO filtro do grupo
   perguntado. Forma segura: 100.0 * SUM(CASE WHEN <grupo> AND <condicao> THEN 1 ELSE 0 END)
   / SUM(CASE WHEN <grupo> THEN 1 ELSE 0 END) — nunca divida por COUNT(*) sem o filtro do grupo.
+- Taxa POR tipo/grupo (GROUP BY): calcule a razao dentro de cada grupo, ex.:
+  SELECT tipo, ROUND(100.0 * SUM(CASE WHEN falso_positivo = 'Sim' THEN 1 ELSE 0 END) / COUNT(*), 1)
+  AS taxa FROM incidentes GROUP BY tipo ORDER BY taxa DESC.
 - 'Agora'/'abertos agora' = status IN ('Aberto','Em atendimento')."""
 
 
