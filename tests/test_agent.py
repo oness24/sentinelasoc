@@ -281,6 +281,50 @@ def test_dividir_chunk_longo_sem_cauda_duplicada():
     assert not any(blocos.count(b) > 2 for b in set(blocos))
 
 
+def test_guarda_dominio_corrige_rota_direta():
+    """Pergunta de seguranca com roteador insisting em 'direto': guarda forca RAG."""
+    import pytest
+
+    llm = FakeLLM(
+        complete_responses=[
+            '{"acao": "direto", "resposta": "veja o playbook"}',  # rota inicial (errada)
+            '{"acao": "direto", "resposta": "ainda direto"}',  # reconsulta tambem errada
+        ],
+        stream_chunks=["Passos do playbook recuperados."],
+    )
+    agente = AgenteSOC(llm=llm)
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr("sentinelasoc.agent.rag.retrieve", lambda q, k=None: [])
+        saida = "".join(agente.answer("Como devo responder a um incidente de phishing?"))
+    assert "Passos do playbook" in saida
+    tipos = [t["tipo"] for t in agente.last_trace]
+    assert "retry" in tipos, tipos
+    decisoes = [t.get("decisao", "") for t in agente.last_trace if t["tipo"] == "direto"]
+    assert any("guarda" in d for d in decisoes), decisoes
+    assert any(t["tipo"] == "rag" for t in agente.last_trace)
+
+
+def test_guarda_dominio_nao_afeta_conversa_social():
+    llm = FakeLLM(
+        complete_responses=['{"acao": "direto", "resposta": "Ola! Como posso ajudar?"}'],
+        stream_chunks=[],
+    )
+    agente = AgenteSOC(llm=llm)
+    saida = "".join(agente.answer("oi, tudo bem?"))
+    assert "Ola" in saida
+    assert not any(t["tipo"] == "retry" for t in agente.last_trace)
+
+
+def test_formatar_evento_tempo_e_desconhecido():
+    from sentinelasoc.web.trace import formatar_evento
+
+    chip, texto = formatar_evento({"tipo": "tempo", "etapa": "roteamento", "segundos": 1.411})
+    assert chip == "tempo" and "roteamento" in texto and "1.4s" in texto
+    assert formatar_evento({"tipo": "request", "id": "ab"}) is None
+    chip2, texto2 = formatar_evento({"tipo": "coisado", "a": 1})
+    assert chip2 == "coisado" and "{" not in texto2
+
+
 def test_rota_invalida_degrada_com_erro_rastreavel():
     llm = FakeLLM(
         complete_responses=["resposta completamente fora de formato"],

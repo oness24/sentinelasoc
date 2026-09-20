@@ -43,33 +43,24 @@ def _agente() -> AgenteSOC:
 
 
 def _renderizar_trace(trace: list[dict]) -> None:
+    from sentinelasoc.web.trace import formatar_evento
+
     classes = {
         "sql": "tk-sql",
         "rag": "tk-rag",
         "ctx": "tk-ctx",
         "retry": "tk-retry",
         "erro": "tk-erro",
+        "tempo": "tk-meta",
+        "direto": "tk-meta",
     }
     linhas = []
     for item in trace:
-        tipo = item.get("tipo", "?")
+        formatado = formatar_evento(item)
+        if not formatado:
+            continue
+        tipo, detalhe = formatado
         cls = classes.get(tipo, "tk-meta")
-        if tipo == "request":
-            continue
-        if tipo == "sql":
-            detalhe = f"{item['sql'][:130]} · {item['linhas']} linha(s)"
-        elif tipo == "rag":
-            detalhe = f"consulta: {item.get('consulta', '')[:60]} · {item.get('chunks', 0)} trechos"
-        elif tipo == "ctx":
-            detalhe = f"seguimento reformulado → {item.get('reescrita', '')[:90]}"
-        elif tipo in ("retry", "erro"):
-            detalhe = str(item.get("detalhe", ""))[:120]
-        elif tipo == "direto":
-            detalhe = str(item.get("decisao", ""))[:90]
-        elif tipo in ("roteamento", "reformulacao", "resposta"):
-            continue
-        else:
-            detalhe = str(item)[:100]
         linhas.append(
             f"<div class='trace-row'><span class='k {cls}'>{tipo}</span>"
             f"<span class='v'>{detalhe}</span></div>"

@@ -30,6 +30,15 @@ MAX_HISTORIA = 6
 # Perguntas que exigem razao (divisao) na consulta
 _RE_TAXA = re.compile(r"\b(taxa|percentual|propor[cç][ãa]o|porcentagem)\b", re.IGNORECASE)
 
+# Guarda de dominio: termos de seguranca que JAMAIS respondem 'direto'
+_RE_DOMINIO = re.compile(
+    r"\b(incidente|phishing|malware|ddos|ransomware|vulnerabilidad\w*|cve\b|cvss|"
+    r"senha|password|pol[ií]tica|playbook|ataque|breach|exfiltr\w*|amea[çc]a|"
+    r"exploit|patch|mitre|t[áa]tica|lgpd|anpd|triagem|severidade|falsos? positiv\w*|"
+    r"incident|attack|threat|breached?)\b",
+    re.IGNORECASE,
+)
+
 
 def _exige_razao(pergunta: str, sql: str) -> bool:
     """Heuristica: pergunta pede taxa/percentual mas o SQL nao calcula divisao alguma."""
@@ -364,6 +373,53 @@ class AgenteSOC:
             rota.get("acao"),
             [f.get("tipo") for f in rota.get("ferramentas", [])],
         )
+
+        # 1b) Guarda de dominio: pergunta de seguranca jamais responde 'direto'
+        # (o roteador 7B varia entre execucoes; a guarda e deterministica).
+        if rota.get("acao") == "direto" and _RE_DOMINIO.search(pergunta_efetiva):
+            log.info("route.guard dominio=true acao=direto — reconsultando")
+            trace.append(
+                {
+                    "tipo": "retry",
+                    "detalhe": "rota 'direto' em pergunta de domínio — reconsultando roteador",
+                }
+            )
+            with timed("roteamento-guarda", trace):
+                try:
+                    rota2 = extrair_json(
+                        cliente.complete(
+                            [
+                                {"role": "system", "content": ROUTER_PROMPT},
+                                {
+                                    "role": "user",
+                                    "content": (
+                                        f"{pergunta_efetiva}\n\n"
+                                        "ATENCAO: esta pergunta e do dominio de seguranca "
+                                        'e EXIGE ferramentas. Nao use "direto".'
+                                    ),
+                                },
+                            ],
+                            temperature=0.0,
+                            json_mode=True,
+                        )
+                    )
+                except (ValueError, KeyError):
+                    rota2 = {"acao": "direto"}
+            if rota2.get("acao") == "direto":
+                rota = {
+                    "acao": "consultar",
+                    "ferramentas": [{"tipo": "rag", "consulta": pergunta_efetiva}],
+                }
+                trace.append(
+                    {"tipo": "direto", "decisao": "rota corrigida para RAG pela guarda de domínio"}
+                )
+                log.info("route.guard forcou rag")
+            else:
+                rota = rota2
+                log.info(
+                    "route.guard corrigido pelo roteador ferramentas=%s",
+                    [f.get("tipo") for f in rota.get("ferramentas", [])],
+                )
 
         if rota.get("acao") == "direto":
             trace.append({"tipo": "direto", "decisao": "resposta direta sem ferramentas"})
