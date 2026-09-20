@@ -55,10 +55,9 @@ body::before {
   z-index: -9999;
   pointer-events: none;
   background:
-    radial-gradient(130px 130px at 63% 55%, rgba(255, 216, 90, .55), transparent 72%),
-    radial-gradient(480px 400px at 62% 54%, rgba(245, 186, 20, .26), transparent 68%),
-    radial-gradient(1300px 950px at 62% 50%, rgba(196, 141, 12, .15), transparent 65%),
-    radial-gradient(900px 700px at 8% 96%, rgba(245, 186, 20, .07), transparent 60%),
+    radial-gradient(700px 520px at 108% -8%, rgba(245, 186, 20, .30), transparent 62%),
+    radial-gradient(1200px 900px at 104% -4%, rgba(196, 141, 12, .13), transparent 65%),
+    radial-gradient(900px 700px at -6% 104%, rgba(245, 186, 20, .08), transparent 60%),
     #07050a;
 }
 html, body { background: #07050a !important; }
