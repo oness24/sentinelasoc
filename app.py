@@ -10,130 +10,231 @@ from sentinelasoc import db, rag
 from sentinelasoc.agent import AgenteSOC
 from sentinelasoc.settings import get_settings
 
-st.set_page_config(page_title="SentinelaSOC", page_icon="🛡️", layout="centered")
+st.set_page_config(page_title="SentinelaSOC", page_icon="🛡️", layout="wide")
 
 settings = get_settings()
 
-# ---------- Estado da sessao ----------
+# ─────────────────────────────────────────────────────────────────────────────
+# Estilo (um unico bloco HTML, sem linhas em branco — senao o parser escapa)
+# ─────────────────────────────────────────────────────────────────────────────
+CSS = """<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #0a0e13; --panel: #10161e; --panel-2: #151d27; --border: #1e2836;
+    --text: #dce4ee; --muted: #7d8da1; --accent: #2dd4a7; --accent-dim: #1a8f6e;
+    --red: #f0564a; --mono: 'JetBrains Mono', ui-monospace, monospace; }
+  html, body, .stApp { background: var(--bg); color: var(--text);
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; }
+  [data-testid="stHeader"] { background: transparent; height: 0; }
+  [data-testid="stToolbar"] { display: none; }
+  footer { display: none; }
+  [data-testid="stStatusWidget"] { display: none; }
+  #MainMenu, .stDeployButton { visibility: hidden; }
+  .block-container { padding-top: 1.2rem; max-width: 920px; margin: 0 auto; }
+  .hero { text-align: center; padding: 4rem 1rem 1.8rem; }
+  .hero .mark { font-size: 3rem; }
+  .hero h1 { font-size: 1.9rem; font-weight: 700; letter-spacing: -.02em; margin: .6rem 0 .3rem; color: var(--text); }
+  .hero h1 span { color: var(--accent); }
+  .hero p { color: var(--muted); font-size: .95rem; max-width: 560px; margin: 0 auto 1.6rem; }
+  .hero .tags { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; }
+  .tag { font-family: var(--mono); font-size: .72rem; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 999px; padding: .3rem .75rem; }
+  .topbar { display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border); padding: .65rem 0; margin-bottom: 1.2rem; }
+  .topbar .brand { display: flex; align-items: center; gap: .6rem; font-weight: 700; letter-spacing: -.01em; color: var(--text); }
+  .topbar .brand .dot { width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+  .topbar .meta { font-family: var(--mono); font-size: .72rem; color: var(--muted); }
+  .topbar .meta b { color: var(--text); font-weight: 500; }
+  .quick button { background: var(--panel) !important; color: var(--text) !important;
+    border: 1px solid var(--border) !important; border-radius: 10px; padding: .7rem .9rem;
+    text-align: left; font-size: .86rem; transition: border-color .15s, background .15s;
+    font-family: 'Inter', sans-serif; }
+  .quick button:hover { border-color: var(--accent-dim) !important; background: var(--panel-2) !important; }
+  [data-testid="stChatMessage"] { background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: .9rem 1.1rem; margin: .4rem 0 1rem; }
+  [data-testid="stChatMessage"] [data-testid="chatAvatarIcon"] { font-size: 1.45rem; }
+  [data-testid="stChatMessage"] p { font-size: .92rem; line-height: 1.55; margin-bottom: .5rem; }
+  .cursor { display: inline-block; color: var(--accent); animation: blink 1s step-start infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  [data-testid="stExpander"] { border: 1px solid var(--border); border-radius: 10px; background: var(--panel); }
+  [data-testid="stExpander"] summary { font-family: var(--mono); font-size: .78rem; }
+  [data-testid="stExpander"] summary span { color: var(--muted) !important; }
+  .trace-row { font-family: var(--mono); font-size: .74rem; color: var(--muted);
+    padding: .15rem 0; display: flex; gap: .6rem; align-items: baseline; }
+  .trace-row .k { color: var(--accent); min-width: 64px; }
+  .trace-row .k.err { color: var(--red); }
+  .stCodeBlock { border-radius: 8px; }
+  code { font-family: var(--mono) !important; }
+  [data-testid="stChatInput"] { border-color: var(--border); }
+  [data-testid="stChatInput"] textarea { background: var(--panel) !important;
+    color: var(--text) !important; font-family: 'Inter', sans-serif; border-radius: 10px; }
+  section[data-testid="stSidebar"] { background: var(--panel); border-right: 1px solid var(--border); }
+  section[data-testid="stSidebar"] * { color: var(--text); }
+  .side-brand { display: flex; align-items: center; gap: .55rem; font-weight: 700;
+    font-size: 1.05rem; letter-spacing: -.01em; padding: .2rem 0 .1rem; }
+  .side-brand .dot { width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+  .side-sub { color: var(--muted) !important; font-size: .78rem; font-family: var(--mono); }
+  .side-h { font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted) !important; font-weight: 600; margin: 1.4rem 0 .5rem; }
+  .side-kv { display: flex; justify-content: space-between; font-size: .8rem;
+    padding: .3rem 0; border-bottom: 1px dashed var(--border); }
+  .side-kv .k { color: var(--muted); } .side-kv .v { font-family: var(--mono); font-size: .74rem; }
+  .side-note { font-size: .72rem; color: var(--muted) !important; line-height: 1.5; margin-top: .8rem; }
+  div[data-testid="stStatus"] { border: 1px solid var(--border); border-radius: 10px;
+    background: var(--panel); font-family: var(--mono); font-size: .76rem; }
+</style>"""
+st.markdown(CSS, unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Estado
+# ─────────────────────────────────────────────────────────────────────────────
 if "mensagens" not in st.session_state:
     st.session_state.mensagens = []
 if "pergunta_pendente" not in st.session_state:
     st.session_state.pergunta_pendente = None
 
 
-@st.cache_resource(show_spinner="Inicializando camadas do SentinelaSOC...")
+@st.cache_resource(show_spinner=False)
 def carregar_camadas() -> AgenteSOC:
-    db.conectar()  # garante o DuckDB criado a partir dos CSVs
-    rag.get_collection()  # aquece o modelo de embeddings + ChromaDB
+    db.conectar()
+    rag.get_collection()
     return AgenteSOC()
 
 
-# ---------- Barra lateral ----------
-with st.sidebar:
-    st.title("🛡️ SentinelaSOC")
-    st.caption(f"AI copilot for Security Operations Centers — v{sentinelasoc.__version__}")
-    st.divider()
-
-    st.markdown(
-        """
-        **Camadas de inteligência**
-
-        💬 Chat com streaming de tokens
-
-        📚 **RAG** — ChromaDB + embeddings multilingues
-        sobre 4 documentos internos (política, playbook,
-        FAQ e guia de vulnerabilidades)
-
-        🗄️ **Dados** — DuckDB com 3 tabelas relacionadas
-        (ativos, incidentes, vulnerabilidades)
-
-        🔐 Segredos via `.env` — nada hardcoded
-        """
-    )
-    st.divider()
-
+def _chunks_indexados() -> int | None:
     try:
-        colecao = rag.get_collection()
-        st.markdown(
-            f"""
-            **Status do sistema**
-
-            Modelo LLM: `{settings.llm_model}`
-
-            Embeddings: `{settings.embed_model}`
-
-            Chunks indexados: `{colecao.count()}`
-
-            Tabelas: ativos · incidentes · vulnerabilidades
-            """
-        )
+        return rag.get_collection().count()
     except Exception:
-        st.warning("Camada RAG ainda não inicializada. Execute `python ingest.py`.")
+        return None
 
-    st.divider()
-    st.caption("MIT License · Streamlit · DuckDB · ChromaDB")
 
-# ---------- Cabeçalho ----------
-st.title("🛡️ SentinelaSOC — Copiloto do SOC")
-st.caption(
-    "Pergunte sobre políticas e procedimentos (RAG) ou consulte incidentes, ativos e "
-    "vulnerabilidades em linguagem natural (SQL sobre DuckDB)."
+# ─────────────────────────────────────────────────────────────────────────────
+# Sidebar
+# ─────────────────────────────────────────────────────────────────────────────
+SIDEBAR = f"""
+<div class="side-brand"><span class="dot"></span> SentinelaSOC</div>
+<div class="side-sub">SOC copilot · v{sentinelasoc.__version__}</div>
+<div class="side-h">Runtime</div>
+<div class="side-kv"><span class="k">LLM</span><span class="v">{settings.llm_model}</span></div>
+<div class="side-kv"><span class="k">Embeddings</span><span class="v">MiniLM-L12</span></div>
+<div class="side-kv"><span class="k">Vector store</span><span class="v">ChromaDB</span></div>
+<div class="side-kv"><span class="k">Analytics</span><span class="v">DuckDB</span></div>
+<div class="side-h">Knowledge base</div>
+<div class="side-kv"><span class="k">Chunks indexados</span><span class="v">{_chunks_indexados() or "—"}</span></div>
+<div class="side-kv"><span class="k">Documentos</span><span class="v">4</span></div>
+<div class="side-kv"><span class="k">Tabelas</span><span class="v">3 relacionadas</span></div>
+<div class="side-note">Toda resposta traz um rastro auditável: decisão de roteamento, SQL executado, trechos recuperados e tempos por etapa.</div>
+<div class="side-note" style="opacity:.65">MIT License · dados sintéticos determinísticos</div>
+"""
+with st.sidebar:
+    st.markdown(SIDEBAR, unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Topbar / hero
+# ─────────────────────────────────────────────────────────────────────────────
+st.markdown(
+    f"""
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> SentinelaSOC</div>
+  <div class="meta">llm <b>{settings.llm_model}</b> · local · rag <b>chromadb</b> · sql <b>duckdb</b> · read-only</div>
+</div>
+""",
+    unsafe_allow_html=True,
 )
 
-# ---------- Perguntas de exemplo ----------
-st.markdown("")
-exemplos = [
-    "📚 Qual o SLA de correção para uma CVE com CVSS 9.5 em ativo exposto?",
-    "📊 Quantos incidentes críticos estão abertos agora e em quais ativos?",
-    "📚 Como devo responder a um incidente de phishing?",
-    "📊 Qual a taxa de falsos positivos por tipo de incidente?",
+if not st.session_state.mensagens:
+    st.markdown(
+        """
+<div class="hero">
+  <div class="mark">🛡️</div>
+  <h1>Sentinela<span>SOC</span></h1>
+  <p>Copiloto para analistas de Security Operations. Pergunte sobre políticas e procedimentos internos ou consulte incidentes, ativos e vulnerabilidades em linguagem natural.</p>
+  <div class="tags">
+    <span class="tag">RAG citado</span><span class="tag">SQL somente-leitura</span>
+    <span class="tag">rastro auditável</span><span class="tag">100% local</span>
+  </div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+EXEMPLOS = [
+    ("📚", "Qual o SLA de correção para uma CVE com CVSS 9.5 em ativo exposto?"),
+    ("📊", "Quantos incidentes críticos estão abertos e em quais ativos?"),
+    ("🚨", "Como devo responder a um incidente de phishing?"),
+    ("📉", "Qual a taxa de falsos positivos por tipo de incidente?"),
 ]
-grade = st.columns(2)
-for i, texto in enumerate(exemplos):
-    if grade[i % 2].button(texto, key=f"ex{i}", use_container_width=True):
+
+grade = st.columns(2, gap="small")
+for i, (icone, texto) in enumerate(EXEMPLOS):
+    if grade[i % 2].button(f"{icone}  {texto}", key=f"ex{i}", use_container_width=True):
         st.session_state.pergunta_pendente = texto
 
-st.markdown("---")
-
-# ---------- Verificacao de chave ----------
+# ─────────────────────────────────────────────────────────────────────────────
+# Chave de API
+# ─────────────────────────────────────────────────────────────────────────────
 if not settings.openai_api_key:
-    st.error(
-        "**OPENAI_API_KEY não configurada.** Copie `.env.example` para `.env`, "
-        "informe sua chave e reinicie a aplicação."
-    )
+    st.error("**OPENAI_API_KEY não configurada.** Copie `.env.example` para `.env` e reinicie.")
     st.stop()
 
 agente = carregar_camadas()
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Renderizacao
+# ─────────────────────────────────────────────────────────────────────────────
 def renderizar_trace(trace: list[dict]) -> None:
-    """Painel de rastreabilidade: ferramentas usadas na resposta."""
-    with st.expander("🔍 Rastro da resposta (ferramentas RAG/SQL)"):
+    with st.expander("🔍 rastro da resposta"):
         for item in trace:
             if item["tipo"] == "sql":
-                st.markdown(f"**SQL gerado** ({item['linhas']} linhas):")
+                st.markdown(
+                    f"<div class='trace-row'><span class='k'>sql</span>"
+                    f"<span>{item['linhas']} linhas retornadas</span></div>",
+                    unsafe_allow_html=True,
+                )
                 st.code(item["sql"], language="sql")
             elif item["tipo"] == "rag":
-                st.markdown("**Documentos recuperados:**")
                 for fonte in item["fontes"]:
-                    st.markdown(f"- {fonte}")
+                    st.markdown(
+                        f"<div class='trace-row'><span class='k'>rag</span><span>{fonte}</span></div>",
+                        unsafe_allow_html=True,
+                    )
             elif item["tipo"] == "direto":
-                st.markdown(f"**Decisão:** {item['decisao']}")
-            elif item["tipo"] == "tempo":
-                st.markdown(f"⏱️ {item['etapa']}: {item['segundos']}s")
+                st.markdown(
+                    f"<div class='trace-row'><span class='k'>rota</span><span>{item['decisao']}</span></div>",
+                    unsafe_allow_html=True,
+                )
             elif item["tipo"] == "erro":
-                st.warning(f"Falha: {item['detalhe']}")
+                st.markdown(
+                    f"<div class='trace-row'><span class='k err'>erro</span>"
+                    f"<span>{item['detalhe']}</span></div>",
+                    unsafe_allow_html=True,
+                )
 
 
-# ---------- Historico ----------
+def _resumo_status(trace: list[dict]) -> str:
+    """Rotulo vivo do pipeline conforme o trace cresce."""
+    for item in reversed(trace):
+        if item["tipo"] == "sql":
+            return f"consultando duckdb… {item['linhas']} linhas"
+        if item["tipo"] == "rag":
+            return "buscando documentos…"
+        if item["tipo"] == "erro":
+            return "falha isolada em ferramenta"
+    return "roteando pergunta…"
+
+
 for msg in st.session_state.mensagens:
-    with st.chat_message(msg["role"], avatar="🧑‍💻" if msg["role"] == "user" else "🛡️"):
-        st.markdown(msg["content"])
+    avatar = "🧑‍💻" if msg["role"] == "user" else "🛡️"
+    with st.chat_message(msg["role"], avatar=avatar):
+        st.markdown(msg["content"], unsafe_allow_html=True)
         if msg["role"] == "assistant" and msg.get("trace"):
             renderizar_trace(msg["trace"])
 
-# ---------- Entrada ----------
-pergunta = st.chat_input("Faça sua pergunta ao SentinelaSOC...")
+pergunta = st.chat_input(
+    "Pergunte ao SentinelaSOC — políticas, incidentes, ativos, vulnerabilidades…"
+)
 if st.session_state.pergunta_pendente:
     pergunta = st.session_state.pergunta_pendente
     st.session_state.pergunta_pendente = None
@@ -141,15 +242,27 @@ if st.session_state.pergunta_pendente:
 if pergunta:
     st.session_state.mensagens.append({"role": "user", "content": pergunta})
     with st.chat_message("user", avatar="🧑‍💻"):
-        st.markdown(pergunta)
+        st.markdown(pergunta, unsafe_allow_html=True)
 
     with st.chat_message("assistant", avatar="🛡️"):
+        caixa_status = st.status("roteando pergunta…", expanded=False)
+        placeholder = st.empty()
+        texto = ""
+        vistos = 0
         try:
-            resposta = st.write_stream(agente.answer(pergunta, st.session_state.mensagens[:-1]))
+            for chunk in agente.answer(pergunta, st.session_state.mensagens[:-1]):
+                texto += chunk
+                if len(agente.last_trace) != vistos:
+                    vistos = len(agente.last_trace)
+                    caixa_status.update(label=_resumo_status(agente.last_trace))
+                placeholder.markdown(
+                    texto + '<span class="cursor">▌</span>', unsafe_allow_html=True
+                )
+            caixa_status.update(label="resposta concluída", state="complete", expanded=False)
         except Exception as exc:
-            resposta = f"⚠️ Erro ao processar: `{exc}`"
-            st.error(resposta)
+            texto = f"⚠️ Erro ao processar: `{exc}`"
+        placeholder.markdown(texto, unsafe_allow_html=True)
         st.session_state.mensagens.append(
-            {"role": "assistant", "content": resposta, "trace": agente.last_trace}
+            {"role": "assistant", "content": texto, "trace": agente.last_trace}
         )
         renderizar_trace(agente.last_trace)

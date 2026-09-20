@@ -70,7 +70,7 @@ speaks the OpenAI protocol).
 git clone https://github.com/USERNAME/sentinelasoc && cd sentinelasoc
 make install                # venv + deps (CPU torch)
 cp .env.example .env        # defaults point to a local Ollama instance
-ollama pull qwen3:8b        # any chat model works — see `ollama list`
+ollama pull qwen2.5:7b        # any chat model works — see `ollama list`
 make ingest                 # index docs/ into ChromaDB
 make run                    # → http://localhost:8501
 ```
@@ -93,7 +93,7 @@ download on first question.
 |---|---|---|
 | `OPENAI_API_KEY` | `ollama` | Placeholder for local Ollama; real key for cloud providers |
 | `OPENAI_BASE_URL` | `http://localhost:11434/v1` | Ollama by default; point to OpenAI/OpenRouter/Groq/vLLM when needed |
-| `LLM_MODEL` | `qwen3:8b` | Any model available in `ollama list`, or a cloud model name |
+| `LLM_MODEL` | `qwen2.5:7b` | Any model available in `ollama list`, or a cloud model name |
 | `EMBED_MODEL` | `paraphrase-multilingual-MiniLM-L12-v2` | Embedding model (e5 family supported; prefixes handled automatically) |
 | `RETRIEVAL_K` | `4` | Chunks retrieved per query |
 | `LOG_LEVEL` | `INFO` | Logging |

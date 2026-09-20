@@ -58,6 +58,8 @@ ignore = ["SIM108"]  # ternary nem sempre melhora a leitura
 # prosa de prompt e esquema textual: quebrar linhas mudaria o conteudo enviado ao LLM
 "src/sentinelasoc/prompts.py" = ["E501"]
 "src/sentinelasoc/db.py" = ["E501"]
+# CSS/HTML injetados na interface Streamlit
+"app.py" = ["E501"]
 
 [tool.ruff.format]
 quote-style = "double"
