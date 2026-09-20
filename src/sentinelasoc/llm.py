@@ -60,7 +60,7 @@ class OpenAILLMClient:
                 )
             except OpenAIError as exc:  # transitorias: rate limit, timeout, 5xx
                 ultimo_erro = exc
-                log.warning("tentativa %d falhou (%s); repetindo...", tentativa + 1, exc)
+                log.warning("llm.retry tentativa=%d erro=%s", tentativa + 1, exc)
                 time.sleep(1.5**tentativa)
         raise ultimo_erro  # type: ignore[misc]
 

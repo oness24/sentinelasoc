@@ -15,7 +15,7 @@ from collections.abc import Iterator
 from sentinelasoc import db, rag
 from sentinelasoc.llm import LLMClient, OpenAILLMClient
 from sentinelasoc.prompts import FINAL_PROMPT, ROUTER_PROMPT, SQL_PROMPT, SYSTEM_PROMPT
-from sentinelasoc.telemetry import get_logger, timed
+from sentinelasoc.telemetry import get_logger, request_context, timed
 
 log = get_logger(__name__)
 MAX_HISTORIA = 6
@@ -57,6 +57,7 @@ def _executar_sql(pergunta: str, trace: list[dict], cliente: LLMClient) -> str:
         sql = str(plano["sql"]).strip()
         try:
             colunas, linhas = db.run_select(sql)
+            log.info("sql.executed linhas=%d sql=%s", len(linhas), sql.replace("\n", " "))
             trace.append({"tipo": "sql", "sql": sql, "linhas": len(linhas)})
             if tentativa:
                 trace.append(
@@ -65,6 +66,7 @@ def _executar_sql(pergunta: str, trace: list[dict], cliente: LLMClient) -> str:
             return _formatar_resultado(colunas, linhas)
         except duckdb.Error as exc:  # binder/sintaxe/conversao: regenera com o erro
             ultimo_erro = exc
+            log.warning("sql.retry tentativa=%d erro=%s", tentativa + 1, exc)
             trace.append({"tipo": "retry", "detalhe": f"sql (tentativa {tentativa + 1}): {exc}"})
             mensagens.append({"role": "assistant", "content": sql})
             mensagens.append(
@@ -95,6 +97,7 @@ def _formatar_resultado(colunas: list[str], linhas: list[tuple]) -> str:
 
 def _executar_rag(consulta: str, trace: list[dict]) -> str:
     chunks = rag.retrieve(consulta)
+    log.info("rag.retrieved k=%d top=%s", len(chunks), chunks[0]["fonte"] if chunks else "-")
     trace.append(
         {
             "tipo": "rag",
@@ -129,6 +132,18 @@ class AgenteSOC:
         trace = self.last_trace
         cliente = self._cliente()
 
+        with request_context() as rid:
+            trace.append({"tipo": "request", "id": rid})
+            log.info("request.start pergunta=%r", pergunta[:120])
+            total = 0
+            for chunk in self._answer_com_contexto(pergunta, history, trace, cliente):
+                total += len(chunk)
+                yield chunk
+            log.info("request.done chars=%d", total)
+
+    def _answer_com_contexto(
+        self, pergunta: str, history: list[dict], trace: list[dict], cliente: LLMClient
+    ) -> Iterator[str]:
         # 1) Roteamento (sem streaming, temperatura 0, JSON estrito)
         with timed("roteamento", trace):
             try:
@@ -144,13 +159,19 @@ class AgenteSOC:
                 )
             except (ValueError, KeyError) as exc:
                 # roteamento mal-sucedido: degrada com mensagem util em vez de estourar
-                log.warning("roteamento falhou: %s", exc)
+                log.warning("route.failed erro=%s", exc)
                 trace.append({"tipo": "erro", "detalhe": f"roteamento: {exc}"})
                 yield (
                     "Nao consegui estruturar a consulta agora. "
                     "Tente reformular a pergunta (ex.: cite o tipo de incidente ou o documento)."
                 )
                 return
+
+        log.info(
+            "route.decided acao=%s ferramentas=%s",
+            rota.get("acao"),
+            [f.get("tipo") for f in rota.get("ferramentas", [])],
+        )
 
         if rota.get("acao") == "direto":
             trace.append({"tipo": "direto", "decisao": "resposta direta sem ferramentas"})
@@ -172,7 +193,7 @@ class AgenteSOC:
                             _executar_rag(str(ferramenta.get("consulta", pergunta)), trace)
                         )
             except Exception as exc:  # falha isolada nao derruba a resposta
-                log.warning("ferramenta %s falhou: %s", tipo, exc)
+                log.warning("tool.failed tipo=%s erro=%s", tipo, exc)
                 trace.append({"tipo": "erro", "detalhe": f"{tipo}: {exc}"})
                 partes.append(f"Ferramenta {tipo} falhou: {exc}")
 

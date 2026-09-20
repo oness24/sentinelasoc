@@ -13,6 +13,9 @@ import chromadb
 from sentence_transformers import SentenceTransformer
 
 from sentinelasoc.settings import get_settings
+from sentinelasoc.telemetry import get_logger
+
+log = get_logger(__name__)
 
 _model: SentenceTransformer | None = None
 
@@ -74,6 +77,7 @@ def retrieve(query: str, k: int | None = None) -> list[dict]:
         return []
     n = min(k or s.retrieval_k, col.count())
     res = col.query(query_texts=[query], n_results=n)
+    log.info("rag.query k=%d chunks=%d", n, col.count())
     ids_res, metas_res, dists_res, docs_res = (
         res["ids"],
         res["metadatas"],

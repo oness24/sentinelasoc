@@ -5,6 +5,7 @@ e ensaio para o video de demonstracao.
 
 Uso: python scripts/demo_questions.py [n_perguntas]
 """
+
 import sys
 import time
 from pathlib import Path
@@ -40,10 +41,13 @@ def main() -> None:
             resposta = f"ERRO: {exc}"
         duracao = time.perf_counter() - inicio
         print(resposta[:1200])
-        print("\n[trace] " + " | ".join(
-            f"{t['tipo']}" + (f":{t.get('linhas', '')}linhas" if t["tipo"] == "sql" else "")
-            for t in agente.last_trace
-        ))
+        print(
+            "\n[trace] "
+            + " | ".join(
+                f"{t['tipo']}" + (f":{t.get('linhas', '')}linhas" if t["tipo"] == "sql" else "")
+                for t in agente.last_trace
+            )
+        )
         print(f"[tempo total] {duracao:.1f}s")
 
 

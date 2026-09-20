@@ -26,3 +26,6 @@ evals/chroma_tmp_*/
 .DS_Store
 .idea/
 .vscode/
+
+# Logs rotativos (rastreabilidade)
+logs/

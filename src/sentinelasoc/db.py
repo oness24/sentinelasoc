@@ -12,7 +12,9 @@ from pathlib import Path
 import duckdb
 
 from sentinelasoc.settings import get_settings
+from sentinelasoc.telemetry import get_logger
 
+log = get_logger(__name__)
 _lock = threading.Lock()
 
 # Palavras reservadas que caracterizam escrita/modificacao ou acesso a recursos.
@@ -79,10 +81,13 @@ def validar_sql(sql: str) -> str:
     """Valida a consulta contra a politica somente-leitura e a retorna normalizada."""
     s = sql.strip().rstrip(";").strip()
     if not re.match(r"^(select|with)\b", s, re.IGNORECASE):
+        log.warning("db.guard.blocked motivo=nao_select sql=%r", s[:80])
         raise SQLBloqueadoError("Apenas consultas SELECT sao permitidas.")
     if ";" in s:
+        log.warning("db.guard.blocked motivo=multiplos_statements sql=%r", s[:80])
         raise SQLBloqueadoError("Somente uma declaracao por consulta.")
     if _FORBIDDEN.search(s):
+        log.warning("db.guard.blocked motivo=comando_bloqueado sql=%r", s[:80])
         raise SQLBloqueadoError(
             "Comando de escrita/modificacao/acesso bloqueado pelo guarda de SQL."
         )
@@ -97,6 +102,8 @@ def run_select(sql: str) -> tuple[list[str], list[tuple]]:
     try:
         cur = con.execute(f"SELECT * FROM ({consulta}) _consulta LIMIT {s.sql_max_rows}")
         colunas = [d[0] for d in cur.description]
-        return colunas, cur.fetchall()
+        linhas = cur.fetchall()
+        log.info("db.query ok=true linhas=%d", len(linhas))
+        return colunas, linhas
     finally:
         con.close()
