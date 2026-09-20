@@ -16,7 +16,11 @@ class LLMClient(Protocol):
     """Contrato minimo de um cliente LLM (permite mock nos testes unitarios)."""
 
     def complete(
-        self, messages: list[dict], temperature: float = 0.2, max_tokens: int = 900
+        self,
+        messages: list[dict],
+        temperature: float = 0.2,
+        max_tokens: int = 1500,
+        json_mode: bool = False,
     ) -> str: ...
 
     def stream(
@@ -46,28 +50,47 @@ class OpenAILLMClient:
         self._retries = s.llm_max_retries
 
     def _call_with_retries(
-        self, messages: list[dict], temperature: float, max_tokens: int, stream: bool
+        self,
+        messages: list[dict],
+        temperature: float,
+        max_tokens: int,
+        stream: bool,
+        json_mode: bool = False,
     ):
         ultimo_erro: Exception | None = None
         for tentativa in range(self._retries + 1):
             try:
-                return self._client.chat.completions.create(
-                    model=self.model,
-                    messages=messages,  # type: ignore[arg-type]
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    stream=stream,
-                )
+                kwargs: dict = {
+                    "model": self.model,
+                    "messages": messages,  # type: ignore[arg-type]
+                    "temperature": temperature,
+                    "max_tokens": max_tokens,
+                    "stream": stream,
+                }
+                if json_mode and not stream:
+                    kwargs["response_format"] = {"type": "json_object"}
+                return self._client.chat.completions.create(**kwargs)  # type: ignore[arg-type]
             except OpenAIError as exc:  # transitorias: rate limit, timeout, 5xx
                 ultimo_erro = exc
+                if json_mode and "response_format" in str(exc):
+                    # provedor/modelo sem suporte a JSON mode: cai para modo texto
+                    log.warning("llm.json_mode.unsupported erro=%s", exc)
+                    json_mode = False
+                    continue
                 log.warning("llm.retry tentativa=%d erro=%s", tentativa + 1, exc)
                 time.sleep(1.5**tentativa)
         raise ultimo_erro  # type: ignore[misc]
 
     def complete(
-        self, messages: list[dict], temperature: float = 0.2, max_tokens: int = 1500
+        self,
+        messages: list[dict],
+        temperature: float = 0.2,
+        max_tokens: int = 1500,
+        json_mode: bool = False,
     ) -> str:
-        resp = self._call_with_retries(messages, temperature, max_tokens, stream=False)
+        resp = self._call_with_retries(
+            messages, temperature, max_tokens, stream=False, json_mode=json_mode
+        )
         return _sem_pensamento(resp.choices[0].message.content or "")
 
     def stream(

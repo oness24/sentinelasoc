@@ -96,6 +96,7 @@ def _reformular(pergunta: str, history: list[dict], cliente: LLMClient) -> str:
             ],
             temperature=0.0,
             max_tokens=400,
+            json_mode=True,
         )
     )
     independente = str(plano.get("pergunta_independente", pergunta)).strip()
@@ -120,7 +121,7 @@ def _executar_sql(
     ultimo_erro: Exception | None = None
     for tentativa in range(3):
         try:
-            plano = extrair_json(cliente.complete(mensagens, temperature=0.0))
+            plano = extrair_json(cliente.complete(mensagens, temperature=0.0, json_mode=True))
             sql = str(plano["sql"]).strip()
         except (ValueError, KeyError) as exc:  # JSON malformado: tenta novamente
             ultimo_erro = exc
@@ -277,6 +278,7 @@ class AgenteSOC:
                     ],
                     temperature=0.0,
                     max_tokens=400,
+                    json_mode=True,
                 )
             )
             fatos = [str(f).strip() for f in plano.get("fatos", []) if str(f).strip()]
@@ -319,6 +321,7 @@ class AgenteSOC:
                             {"role": "user", "content": pergunta_efetiva},
                         ],
                         temperature=0.0,
+                        json_mode=True,
                     )
                 )
             except (ValueError, KeyError) as exc:

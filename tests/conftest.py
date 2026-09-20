@@ -14,7 +14,7 @@ class FakeLLM:
         self.complete_calls: list[list[dict]] = []
         self.stream_calls: list[list[dict]] = []
 
-    def complete(self, messages, temperature=0.2, max_tokens=900) -> str:
+    def complete(self, messages, temperature=0.2, max_tokens=900, json_mode=False) -> str:
         self.complete_calls.append(messages)
         return self._responses.pop(0)
 

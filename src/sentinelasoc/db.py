@@ -48,81 +48,126 @@ def conectar(refresh: bool = False) -> duckdb.DuckDBPyConnection:
         return con
 
 
+def _enumerar_valores(con: duckdb.DuckDBPyConnection) -> dict[str, list[str]]:
+    """Valores distintos (cardinalidade <= 10) por coluna TEXT — enums do esquema."""
+    enums: dict[str, list[str]] = {}
+    colunas = con.execute(
+        "SELECT table_name, column_name FROM information_schema.columns "
+        "WHERE table_schema = 'main' AND data_type = 'VARCHAR'"
+    ).fetchall()
+    for tabela, coluna in colunas:
+        distintos = con.execute(
+            f'SELECT DISTINCT "{coluna}" FROM "{tabela}" WHERE "{coluna}" IS NOT NULL LIMIT 11'
+        ).fetchall()
+        if 0 < len(distintos) <= 10:  # 11+ distintos = nao e enum
+            enums[coluna] = [str(v[0]) for v in distintos]
+    return enums
+
+
+_ENUM_CACHE: tuple[float, dict[str, list[str]]] | None = None
+
+
+def _enums() -> dict[str, list[str]]:
+    """Enums do esquema com cache por mtime do banco (invalida ao reconstruir)."""
+    global _ENUM_CACHE
+    s = get_settings()
+    try:
+        mtime = s.db_path.stat().st_mtime
+    except OSError:
+        mtime = 0.0
+    if _ENUM_CACHE and _ENUM_CACHE[0] == mtime:
+        return _ENUM_CACHE[1]
+    con = conectar()
+    try:
+        enums = _enumerar_valores(con)
+    finally:
+        con.close()
+    _ENUM_CACHE = (mtime, enums)
+    return enums
+
+
 def schema_descritivo() -> str:
-    """Esquema das tabelas (em texto) injetado no prompt de geracao de SQL."""
-    return """Tabelas disponiveis no DuckDB (dados sinteticos da Aurora Tecnologia, periodo 2025-09 a 2026-09-20):
+    """Esquema introspectado ao vivo do DuckDB (tabelas, tipos, enums, contagens).
 
-TABELA ativos (catalogo de ativos de TI):
-  ativo_id TEXT (PK, ex ATV-001) | hostname TEXT | ip TEXT | sistema_operacional TEXT
-  ambiente TEXT ('Producao','Homologacao','DMZ') | criticidade TEXT ('Alta','Media','Baixa')
-  departamento TEXT | responsavel TEXT | exposto_internet TEXT ('Sim','Nao')
+    Nada hardcoded: trocar os CSVs por outros dados torna o sistema utilizavel
+    sem alteracao de codigo — o prompt de SQL se monta sozinho.
+    """
+    con = conectar()
+    try:
+        tabelas = [
+            r[0]
+            for r in con.execute(
+                "SELECT table_name FROM information_schema.tables "
+                "WHERE table_schema = 'main' ORDER BY table_name"
+            ).fetchall()
+        ]
+        enums = _enumerar_valores(con)
+        blocos: list[str] = []
+        for tabela in tabelas:
+            linha_total = con.execute(f'SELECT COUNT(*) FROM "{tabela}"').fetchone()
+            total = int(linha_total[0]) if linha_total else 0
+            colunas = con.execute(
+                "SELECT column_name, data_type FROM information_schema.columns "
+                "WHERE table_schema = 'main' AND table_name = ? ORDER BY ordinal_position",
+                [tabela],
+            ).fetchall()
+            partes = []
+            for nome, tipo in colunas:
+                partes.append(f"{nome} {tipo.upper()}")
+                if nome in enums:
+                    partes.append(f"('{enums[nome][0]}')")
+            blocos.append(f"TABELA {tabela} ({total} linhas): " + " | ".join(partes))
 
-TABELA incidentes (incidentes de seguranca registrados pelo SOC):
-  incidente_id TEXT (PK, ex INC-2026-0001) | ativo_id TEXT (FK -> ativos)
-  data_abertura DATE | tipo TEXT ('Phishing','Forca Bruta','Malware','DDoS','Exfiltracao de Dados','Acesso Anomalo','Vulnerabilidade Explorada','Engenharia Social')
-  severidade TEXT ('Critica','Alta','Media','Baixa') | tatica_mitre TEXT (ex 'T1566 - Initial Access')
-  status TEXT ('Aberto','Em atendimento','Resolvido') | analista_responsavel TEXT
-  horas_para_resolver DOUBLE (vazio quando nao resolvido) | falso_positivo TEXT ('Sim','Nao')
+        # relacionamentos por convencao <nome>_id repetido entre tabelas
+        todas: dict[str, set[str]] = {}
+        for tabela in tabelas:
+            for (nome,) in con.execute(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema = 'main' AND table_name = ?",
+                [tabela],
+            ).fetchall():
+                if nome.endswith("_id"):
+                    todas.setdefault(nome, set()).add(tabela)
+        rels = [
+            f"{coluna} presente em {', '.join(sorted(ts))} (chave de relacionamento)"
+            for coluna, ts in sorted(todas.items())
+            if len(ts) > 1
+        ]
+    finally:
+        con.close()
 
-TABELA vulnerabilidades (falhas detectadas nos ativos):
-  vulnerabilidade_id TEXT (PK, ex VULN-001) | ativo_id TEXT (FK -> ativos)
-  cve TEXT | descricao TEXT | cvss DOUBLE (0 a 10)
-  data_deteccao DATE | status TEXT ('Aberta','Em correcao','Corrigida') | prazo_sla_dias INTEGER
-
-Relacionamentos: incidentes.ativo_id -> ativos.ativo_id; vulnerabilidades.ativo_id -> ativos.ativo_id.
-Datas no formato DATE 'YYYY-MM-DD'. Hoje e 2026-09-20.
-
-DICAS IMPORTANTES:
-- A coluna severidade existe SOMENTE em incidentes. A criticidade de uma vulnerabilidade
-  e expressa pelo cvss (critica = cvss >= 9.0; alta = cvss >= 7.0).
-- Comparacoes de texto sao CASE-SENSITIVE: copie a capitalizacao EXATA dos valores listados
-  acima (ex.: status = 'Aberta', NUNCA 'aberta'; severidade = 'Critica').
-- Taxas/percentuais de um subgrupo: o DENOMINADOR deve ter o MESMO filtro do grupo
-  perguntado. Forma segura: 100.0 * SUM(CASE WHEN <grupo> AND <condicao> THEN 1 ELSE 0 END)
-  / SUM(CASE WHEN <grupo> THEN 1 ELSE 0 END) — nunca divida por COUNT(*) sem o filtro do grupo.
-- Taxa POR tipo/grupo (GROUP BY): calcule a razao dentro de cada grupo, ex.:
-  SELECT tipo, ROUND(100.0 * SUM(CASE WHEN falso_positivo = 'Sim' THEN 1 ELSE 0 END) / COUNT(*), 1)
-  AS taxa FROM incidentes GROUP BY tipo ORDER BY taxa DESC.
-- 'Agora'/'abertos agora' = status IN ('Aberto','Em atendimento')."""
+    rel_linha = ("\n" + "\n".join(rels)) if rels else ""
+    return (
+        "Tabelas disponiveis no DuckDB (esquema introspectado automaticamente):\n\n"
+        + "\n\n".join(blocos)
+        + rel_linha
+        + "\n\nValores possiveis das colunas enumeraveis: "
+        + "; ".join(f"{c}: {', '.join(vs)}" for c, vs in sorted(enums.items()))
+        + "\n\nDICAS IMPORTANTES:\n"
+        "- Comparacoes de texto sao CASE-SENSITIVE: copie a capitalizacao EXATA dos valores acima.\n"
+        "- Taxas/percentuais de um subgrupo: o DENOMINADOR deve ter o MESMO filtro do grupo\n"
+        "  perguntado (100.0 * SUM(CASE WHEN <grupo> AND <cond> THEN 1 ELSE 0 END)\n"
+        "  / SUM(CASE WHEN <grupo> THEN 1 ELSE 0 END)).\n"
+        "- Perguntas com 'quantos' pedem COUNT do predicado exato; 'taxa' pede razao com divisao.\n"
+        "- Datas como DATE 'YYYY-MM-DD'."
+    )
 
 
 class SQLBloqueadoError(ValueError):
     """Levantada quando a consulta viola a politica somente-leitura."""
 
 
-# Valores enumeraveis por coluna (para normalizacao de literais gerados por LLM)
-_VALORES_COLUNA: dict[str, list[str]] = {
-    "status": ["Aberto", "Em atendimento", "Resolvido", "Aberta", "Em correcao", "Corrigida"],
-    "severidade": ["Critica", "Alta", "Media", "Baixa"],
-    "criticidade": ["Alta", "Media", "Baixa"],
-    "ambiente": ["Producao", "Homologacao", "DMZ"],
-    "exposto_internet": ["Sim", "Nao"],
-    "falso_positivo": ["Sim", "Nao"],
-    "tipo": [
-        "Phishing",
-        "Forca Bruta",
-        "Malware",
-        "DDoS",
-        "Exfiltracao de Dados",
-        "Acesso Anomalo",
-        "Vulnerabilidade Explorada",
-        "Engenharia Social",
-    ],
-}
-
-
 def normalizar_literais(sql: str) -> str:
     """Corrige literais de texto com capitalizacao errada (ex.: 'aberta' -> 'Aberta').
 
     O LLM frequentemente gera minusculas; DuckDB e case-sensitive. Comparamos contra
-    os valores enumeraveis conhecidos do esquema e substituimos apenas casamentos exatos
-    (ignorando caixa). Literais desconhecidos sao preservados.
+    os valores enumeraveis do proprio esquema (introspectados em _enums) e substituimos
+    apenas casamentos exatos (ignorando caixa). Literais desconhecidos sao preservados.
     """
-    mapa = {
-        (coluna, valor.lower()): valor
-        for coluna, valores in _VALORES_COLUNA.items()
-        for valor in valores
-    }
+    mapa: dict[tuple[str, str], str] = {}
+    for coluna, valores in _enums().items():
+        for valor in valores:
+            mapa[(coluna.lower(), valor.lower())] = valor
 
     def _troca(m: re.Match) -> str:
         coluna, literal = m.group(1), m.group(2)
