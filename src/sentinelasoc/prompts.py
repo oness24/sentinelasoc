@@ -29,10 +29,10 @@ SQL_PROMPT = """Voce e o gerador de SQL do SentinelaSOC. Escreva UMA consulta Du
 {schema}
 
 REGRAS:
-- Somente SELECT. Use nomes de tabelas e colunas EXATAMENTE como no esquema.
+- Somente SELECT. Use nomes de tabelas e colunas EXATAMENTE como no esquema acima, copiando caractere por caractere — as colunas estao em PORTUGUES (ex.: horas_para_resolver, NUNCA hours_to_resolve).
 - Datas como DATE 'YYYY-MM-DD'. Hoje e DATE '2026-09-20'.
 - Sem ponto e virgula no final. Uma unica declaracao.
-- Para medias de horas_para_resolver, filtre por status='Resolvido' e trate nulos com NULLIF/FILTER.
+- Para medias de horas_para_resolver, filtre por status='Resolvido'; AVG ja ignora NULLs (nao use NULLIF para isso).
 - Quando util, arredonde valores numericos (ROUND(x, 1)).
 
 Responda SOMENTE com JSON valido: {{"sql": "SELECT ..."}}"""

@@ -63,6 +63,7 @@ CSS = """<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500
     padding: .15rem 0; display: flex; gap: .6rem; align-items: baseline; }
   .trace-row .k { color: var(--accent); min-width: 64px; }
   .trace-row .k.err { color: var(--red); }
+  .trace-row .k.retry { color: #f0b429; }
   .stCodeBlock { border-radius: 8px; }
   code { font-family: var(--mono) !important; }
   [data-testid="stChatInput"] { border-color: var(--border); }
@@ -203,6 +204,12 @@ def renderizar_trace(trace: list[dict]) -> None:
             elif item["tipo"] == "direto":
                 st.markdown(
                     f"<div class='trace-row'><span class='k'>rota</span><span>{item['decisao']}</span></div>",
+                    unsafe_allow_html=True,
+                )
+            elif item["tipo"] == "retry":
+                st.markdown(
+                    f"<div class='trace-row'><span class='k retry'>retry</span>"
+                    f"<span>{item['detalhe']}</span></div>",
                     unsafe_allow_html=True,
                 )
             elif item["tipo"] == "erro":

@@ -40,15 +40,48 @@ def _historico_mensagens(history: list[dict]) -> list[dict]:
 
 
 def _executar_sql(pergunta: str, trace: list[dict], cliente: LLMClient) -> str:
-    """Gera SQL via LLM, valida contra o guarda somente-leitura e executa no DuckDB."""
-    s_json = {"role": "system", "content": SQL_PROMPT.format(schema=db.schema_descritivo())}
-    plano = extrair_json(
-        cliente.complete([s_json, {"role": "user", "content": pergunta}], temperature=0.0)
-    )
-    sql = str(plano["sql"]).strip()
-    colunas, linhas = db.run_select(sql)
-    trace.append({"tipo": "sql", "sql": sql, "linhas": len(linhas)})
+    """Gera SQL via LLM, valida contra o guarda somente-leitura e executa no DuckDB.
 
+    Auto-correcao: erros de execucao (coluna inexistente, sintaxe) sao devolvidos
+    ao LLM para regeneracao, em ate 3 tentativas — padrao text-to-SQL robusto.
+    """
+    import duckdb
+
+    mensagens = [
+        {"role": "system", "content": SQL_PROMPT.format(schema=db.schema_descritivo())},
+        {"role": "user", "content": pergunta},
+    ]
+    ultimo_erro: Exception | None = None
+    for tentativa in range(3):
+        plano = extrair_json(cliente.complete(mensagens, temperature=0.0))
+        sql = str(plano["sql"]).strip()
+        try:
+            colunas, linhas = db.run_select(sql)
+            trace.append({"tipo": "sql", "sql": sql, "linhas": len(linhas)})
+            if tentativa:
+                trace.append(
+                    {"tipo": "direto", "decisao": f"sql autocorrigido na tentativa {tentativa + 1}"}
+                )
+            return _formatar_resultado(colunas, linhas)
+        except duckdb.Error as exc:  # binder/sintaxe/conversao: regenera com o erro
+            ultimo_erro = exc
+            trace.append({"tipo": "retry", "detalhe": f"sql (tentativa {tentativa + 1}): {exc}"})
+            mensagens.append({"role": "assistant", "content": sql})
+            mensagens.append(
+                {
+                    "role": "user",
+                    "content": (
+                        f"A consulta acima falhou com o erro:\n{exc}\n\n"
+                        "Corrija usando EXATAMENTE os nomes de tabelas e colunas do esquema "
+                        "(colunas em portugues, ex.: horas_para_resolver). "
+                        'Responda novamente SOMENTE com JSON: {"sql": "SELECT ..."}'
+                    ),
+                }
+            )
+    raise ValueError(f"SQL falhou apos 3 tentativas: {ultimo_erro}")
+
+
+def _formatar_resultado(colunas: list[str], linhas: list[tuple]) -> str:
     if not linhas:
         return "Resultado da consulta SQL: nenhum registro encontrado."
     cabecalho = " | ".join(colunas)

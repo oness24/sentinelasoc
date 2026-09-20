@@ -89,6 +89,41 @@ def test_rota_rag_usa_recuperacao(monkeypatch):
     assert "politica_de_seguranca.md" in rag_trace["fontes"][0]
 
 
+def _resp_sql(sql: str) -> str:
+    return json.dumps({"sql": sql})
+
+
+def test_sql_autocorrige_coluna_inexistente():
+    """1a geracao referencia coluna errada; o agente devolve o erro ao LLM e regenera."""
+    llm = FakeLLM(
+        complete_responses=[
+            rota_consultar([{"tipo": "sql", "pergunta": "tempo medio de resolucao"}]),
+            _resp_sql(
+                "SELECT ROUND(AVG(hours_to_resolve),1) AS media FROM incidentes "
+                "WHERE status='Resolvido'"
+            ),
+            _resp_sql(
+                "SELECT ROUND(AVG(horas_para_resolver),1) AS media FROM incidentes "
+                "WHERE status='Resolvido'"
+            ),
+        ],
+        stream_chunks=["Media calculada."],
+    )
+    agente = AgenteSOC(llm=llm)
+    saida = "".join(agente.answer("qual o tempo medio de resolucao dos incidentes?"))
+    assert "Media calculada" in saida
+    sql_ok = [t for t in agente.last_trace if t["tipo"] == "sql"]
+    assert len(sql_ok) == 1 and sql_ok[0]["linhas"] == 1
+    autocorr = [
+        t for t in agente.last_trace if t["tipo"] == "direto" and "autocorrigido" in t["decisao"]
+    ]
+    assert autocorr, "deveria registrar a autocorrecao no trace"
+    retries = [t for t in agente.last_trace if t["tipo"] == "retry"]
+    assert retries, "a tentativa falha deveria ficar no rastro como retry"
+    erros_finais = [t for t in agente.last_trace if t["tipo"] == "erro"]
+    assert not erros_finais  # nenhum erro terminal: a autocorrecao resolveu
+
+
 def test_rota_invalida_degrada_com_erro_rastreavel():
     llm = FakeLLM(
         complete_responses=["resposta completamente fora de formato"],
