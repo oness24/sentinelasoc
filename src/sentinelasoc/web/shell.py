@@ -36,6 +36,8 @@ def _fontes_embedded() -> str:
         if not caminho.exists():
             continue
         m = re.match(r"(\w+)-(\d+)-latin\.woff2", arq)
+        if not m:
+            continue
         familia, peso = m.group(1), m.group(2)
         nome = {"Rubik": "Rubik", "JetBrainsMono": "'JetBrains Mono'"}[familia]
         b64 = base64.b64encode(caminho.read_bytes()).decode()
