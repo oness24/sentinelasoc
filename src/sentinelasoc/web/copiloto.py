@@ -23,15 +23,15 @@ def _avatar(svg: str) -> str:
 
 AV_ASSISTENTE = _avatar(
     """<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'
- fill='none'><rect width='28' height='28' rx='7' fill='#101315'/>
+ fill='none'><rect width='28' height='28' rx='7' fill='#2b2050'/>
 <path d='M12 4l6.5 2.8v4.4c0 4-2.7 7.1-6.5 8.8-3.8-1.7-6.5-4.8-6.5-8.8V6.8L12 4z'
- stroke='#30d98c' stroke-width='1.5'/></svg>"""
+ stroke='#c2ef4e' stroke-width='1.5'/></svg>"""
 )
 AV_USUARIO = _avatar(
     """<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'
- fill='none'><rect width='28' height='28' rx='7' fill='#141618'/>
-<circle cx='12' cy='9.5' r='3' stroke='#a8b0b8' stroke-width='1.5'/>
-<path d='M5.8 19c1.2-3 3.5-4.4 6.2-4.4S17 16 18.2 19' stroke='#a8b0b8'
+ fill='none'><rect width='28' height='28' rx='7' fill='#332a52'/>
+<circle cx='12' cy='9.5' r='3' stroke='#a79fc2' stroke-width='1.5'/>
+<path d='M5.8 19c1.2-3 3.5-4.4 6.2-4.4S17 16 18.2 19' stroke='#a79fc2'
  stroke-width='1.5' stroke-linecap='round'/></svg>"""
 )
 
@@ -102,10 +102,12 @@ def render() -> None:
     # ── Estado vazio: hero + sugestoes ──
     if not st.session_state.mensagens and not st.session_state.pergunta_pendente:
         st.markdown(
-            "<div class='hero'><h1>Copiloto do SOC</h1>"
-            "<p>Consulte incidentes, ativos e vulnerabilidades em linguagem natural; "
-            "traga playbooks e políticas com a fonte citada. Cada resposta traz o "
-            "rastro de execução — rota, SQL e trechos recuperados.</p></div>",
+            "<div class='hero'><div class='microlabel' style='color:#c2ef4e'>"
+            "SOC Copilot · execução local</div>"
+            "<h1>Consulte. Investigue. Corrija.</h1>"
+            "<p>Linguagem natural sobre incidentes, ativos e vulnerabilidades; playbooks e "
+            "políticas com a fonte citada. Cada resposta traz o rastro de execução — rota, "
+            "SQL e trechos recuperados.</p></div>",
             unsafe_allow_html=True,
         )
         st.markdown("<div class='sug-grid'>", unsafe_allow_html=True)
