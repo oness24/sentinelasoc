@@ -111,7 +111,8 @@ def salvar_mensagem(cid: str, papel: str, conteudo: str, trace: list[dict] | Non
     agora = _agora()
     with _conectar() as con:
         con.execute(
-            "INSERT INTO mensagens (conversa_id, papel, conteudo, trace, criada_em) VALUES (?,?,?,?,?)",
+            "INSERT INTO mensagens (conversa_id, papel, conteudo, trace, criada_em) "
+            "VALUES (?,?,?,?,?)",
             (cid, papel, conteudo, json.dumps(trace or [], ensure_ascii=False), agora),
         )
         con.execute("UPDATE conversas SET atualizada_em = ? WHERE id = ?", (agora, cid))

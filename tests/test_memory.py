@@ -36,7 +36,7 @@ def test_ciclo_de_vida_de_conversa(banco):
 
 
 def test_titulo_truncado(banco):
-    cid = memory.nova_conversa("x" * 200)
+    memory.nova_conversa("x" * 200)
     assert len(memory.listar_conversas()[0]["titulo"]) == memory.TITULO_MAX
 
 

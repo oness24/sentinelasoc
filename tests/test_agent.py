@@ -132,14 +132,17 @@ def test_seguimento_e_reformulado_em_sql():
         complete_responses=[
             json.dumps(
                 {
-                    "pergunta_independente": "Quantos incidentes criticos abertos no departamento Financeiro?"
+                    "pergunta_independente": (
+                        "Quantos incidentes criticos abertos no departamento Financeiro?"
+                    )
                 },
                 ensure_ascii=False,
             ),
             rota_consultar([{"tipo": "sql", "pergunta": "incidentes criticos do Financeiro"}]),
             _resp_sql(
                 "SELECT COUNT(*) AS total FROM incidentes i JOIN ativos a USING (ativo_id) "
-                "WHERE i.severidade = 'Critica' AND i.status = 'Aberto' AND a.departamento = 'Financeiro'"
+                "WHERE i.severidade = 'Critica' AND i.status = 'Aberto' "
+                "AND a.departamento = 'Financeiro'"
             ),
         ],
         stream_chunks=["Existem 3 no Financeiro."],
