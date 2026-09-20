@@ -21,7 +21,7 @@ NAV = [
 CSS = """
 <style>
 :root {
-  --canvas: #1a142e;
+  --canvas: #060409;
   --deep: #140f22;
   --surface-1: rgba(139,116,255,.045);
   --surface-2: rgba(139,116,255,.08);
@@ -43,18 +43,26 @@ CSS = """
   --ui: 'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 html, body, .stApp, .main, [class*="css"] {
-  background: var(--canvas) !important; color: var(--text);
+  color: var(--text);
   font-family: var(--ui); letter-spacing: -0.005em;
 }
-/* Fundo Quimera: brilhos ambientes em camadas (violeta > roxo > lima) */
-.stApp, section.main {
+/* Fundo Quimera: flare dourado sobre negro — camada fixa ATRAS de tudo
+   (body::before com z-index -9999: nenhum container do Streamlit pinta por cima). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -9999;
+  pointer-events: none;
   background:
-    radial-gradient(1100px 520px at 88% -12%, rgba(66,32,130,.50), transparent 62%),
-    radial-gradient(900px 620px at -12% 108%, rgba(139,125,251,.13), transparent 58%),
-    radial-gradient(760px 420px at 55% 122%, rgba(194,239,78,.045), transparent 62%),
-    var(--canvas) !important;
-  background-attachment: fixed !important;
+    radial-gradient(90px 90px at 63% 56%, rgba(255, 214, 80, .38), transparent 70%),
+    radial-gradient(340px 280px at 62% 55%, rgba(245, 186, 20, .17), transparent 65%),
+    radial-gradient(950px 720px at 62% 52%, rgba(176, 131, 8, .10), transparent 62%),
+    #060409;
 }
+html, body { background: #060409 !important; }
+body, .stApp, .main, [class*="css"], [data-testid="stHeader"], header { background: transparent !important; }
+section[data-testid="stSidebar"] { background: #0c0813 !important; }
 #MainMenu, footer, div[data-testid="stToolbar"] {visibility: hidden; height: 0;}
 
 /* ── App bar ─────────────────────────────────────────── */
