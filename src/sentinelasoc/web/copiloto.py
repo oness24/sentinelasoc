@@ -23,15 +23,15 @@ def _avatar(svg: str) -> str:
 
 AV_ASSISTENTE = _avatar(
     """<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'
- fill='none'><rect width='28' height='28' rx='7' fill='#2b2050'/>
+ fill='none'><rect width='28' height='28' rx='7' fill='#241d10'/>
 <path d='M12 4l6.5 2.8v4.4c0 4-2.7 7.1-6.5 8.8-3.8-1.7-6.5-4.8-6.5-8.8V6.8L12 4z'
- stroke='#c2ef4e' stroke-width='1.5'/></svg>"""
+ stroke='#f5b800' stroke-width='1.5'/></svg>"""
 )
 AV_USUARIO = _avatar(
     """<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'
- fill='none'><rect width='28' height='28' rx='7' fill='#332a52'/>
-<circle cx='12' cy='9.5' r='3' stroke='#a79fc2' stroke-width='1.5'/>
-<path d='M5.8 19c1.2-3 3.5-4.4 6.2-4.4S17 16 18.2 19' stroke='#a79fc2'
+ fill='none'><rect width='28' height='28' rx='7' fill='#2a2519'/>
+<circle cx='12' cy='9.5' r='3' stroke='#b5ac97' stroke-width='1.5'/>
+<path d='M5.8 19c1.2-3 3.5-4.4 6.2-4.4S17 16 18.2 19' stroke='#b5ac97'
  stroke-width='1.5' stroke-linecap='round'/></svg>"""
 )
 
@@ -103,12 +103,11 @@ def render() -> None:
     # ── Estado vazio: hero + sugestoes ──
     if not st.session_state.mensagens and not st.session_state.pergunta_pendente:
         st.markdown(
-            "<div class='hero'><div class='microlabel' style='color:#c2ef4e'>"
-            "SOC Copilot · execução local</div>"
-            "<h1>Consulte. Investigue. Corrija.</h1>"
-            "<p>Linguagem natural sobre incidentes, ativos e vulnerabilidades; playbooks e "
-            "políticas com a fonte citada. Cada resposta traz o rastro de execução — rota, "
-            "SQL e trechos recuperados.</p></div>",
+            "<div class='hero'><div class='microlabel' style='color:#f5b800'>"
+            "Copiloto de segurança · 100% local</div>"
+            "<h1>Pergunte. O SOC responde com dados e fontes.</h1>"
+            "<p>Incidentes, ativos, vulnerabilidades, playbooks e políticas — em linguagem "
+            "natural, com a origem de cada informação citada e auditável.</p></div>",
             unsafe_allow_html=True,
         )
         st.markdown("<div class='sug-grid'>", unsafe_allow_html=True)
@@ -145,7 +144,7 @@ def render() -> None:
                 _meta("SENTINELASOC", req)
                 st.markdown(msg["content"], unsafe_allow_html=True)
                 if tr:
-                    with st.expander("Rastro de execução", expanded=False):
+                    with st.expander("Detalhes da execução", expanded=False):
                         _renderizar_trace(tr)
 
     # ── Pergunta em andamento ──
@@ -159,7 +158,7 @@ def render() -> None:
             {"role": m["role"], "content": m["content"]} for m in st.session_state.mensagens[-6:]
         ]
         with st.chat_message("assistant", avatar=AV_ASSISTENTE):
-            _meta("SENTINELASOC", "consultando…")
+            _meta("SENTINELASOC", "processando")
             caixa = st.status(label="pipeline", expanded=False)
             placeholder = st.empty()
             texto = ""
@@ -176,7 +175,7 @@ def render() -> None:
                 st.error(texto)
             duracao = time.perf_counter() - inicio
             caixa.update(
-                label=f"concluído em {duracao:.1f}s · {len(agente.last_trace)} eventos",
+                label=f"Respondido em {duracao:.1f}s",
                 state="complete",
                 expanded=False,
             )
@@ -184,7 +183,7 @@ def render() -> None:
             st.session_state.mensagens.append(
                 {"role": "assistant", "content": texto, "trace": agente.last_trace}
             )
-            with st.expander("Rastro de execução", expanded=False):
+            with st.expander("Detalhes da execução", expanded=False):
                 _renderizar_trace(agente.last_trace)
 
         # persistencia episodica + aprendizado semantico
@@ -199,7 +198,7 @@ def render() -> None:
                 st.session_state.perfil_fatos = memory.fatos_perfil()
 
     # ── Composer ──
-    nova = st.chat_input("Pergunte sobre políticas, incidentes, ativos ou vulnerabilidades…")
+    nova = st.chat_input("Pergunte ao copiloto…")
     if nova:
         st.session_state.pergunta_pendente = nova
         st.rerun()

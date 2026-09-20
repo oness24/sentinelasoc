@@ -52,7 +52,7 @@ def render() -> None:
         "SELECT tipo, COUNT(*) AS total FROM incidentes GROUP BY tipo ORDER BY total DESC"
     )
     df = pd.DataFrame(linhas, columns=["tipo", "total"])
-    st.bar_chart(df.set_index("tipo"), color="#8b7dfb", height=260)
+    st.bar_chart(df.set_index("tipo"), color="#f5b800", height=260)
 
     col1, col2 = st.columns(2)
     with col1:
@@ -62,7 +62,7 @@ def render() -> None:
             "FROM incidentes GROUP BY 1 ORDER BY 1"
         )
         dfm = pd.DataFrame(linhas_mes, columns=["mes", "total"])
-        st.line_chart(dfm.set_index("mes"), color="#c2ef4e", height=220)
+        st.line_chart(dfm.set_index("mes"), color="#ffd75e", height=220)
     with col2:
         st.markdown("<div class='panel-h'>Falsos positivos por tipo</div>", unsafe_allow_html=True)
         _, linhas_fp = db.run_select(
@@ -70,7 +70,7 @@ def render() -> None:
             "/COUNT(*),1) AS taxa FROM incidentes GROUP BY tipo ORDER BY taxa DESC"
         )
         dff = pd.DataFrame(linhas_fp, columns=["tipo", "taxa"])
-        st.bar_chart(dff.set_index("tipo"), color="#ffb287", height=220)
+        st.bar_chart(dff.set_index("tipo"), color="#ff9d5c", height=220)
 
     st.markdown(
         f"<div class='panel-h'>Top ativos por incidentes · MTTR global {mttr}h</div>",

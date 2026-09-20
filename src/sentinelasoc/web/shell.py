@@ -21,21 +21,21 @@ NAV = [
 CSS = """
 <style>
 :root {
-  --canvas: #060409;
+  --canvas: #07050a;
   --deep: #140f22;
-  --surface-1: rgba(139,116,255,.045);
-  --surface-2: rgba(139,116,255,.08);
-  --surface-3: rgba(139,116,255,.13);
-  --violeta: #2b2050;
-  --violeta-forte: #422082;
-  --bd: #332a52;
-  --bd-strong: #4a3d73;
-  --text: #f4f2fa;
-  --text-2: #a79fc2;
-  --text-3: #6e6591;
-  --roxo: #8b7dfb;
-  --roxo-hover: #a89bff;
-  --lima: #c2ef4e;
+  --surface-1: rgba(245,184,0,.035);
+  --surface-2: rgba(245,184,0,.065);
+  --surface-3: rgba(245,184,0,.11);
+  --violeta: #241d10;
+  --violeta-forte: #3a2e12;
+  --bd: #363021;
+  --bd-strong: #4d4430;
+  --text: #f7f4ec;
+  --text-2: #b5ac97;
+  --text-3: #7a7260;
+  --ouro: #f5b800;
+  --ouro-hover: #ffd02e;
+  --ouro-fraco: rgba(245,184,0,.14);
   --coral: #ffb287;
   --rosa: #fa7faa;
   --azul: #7cb7ff;
@@ -55,14 +55,15 @@ body::before {
   z-index: -9999;
   pointer-events: none;
   background:
-    radial-gradient(90px 90px at 63% 56%, rgba(255, 214, 80, .38), transparent 70%),
-    radial-gradient(340px 280px at 62% 55%, rgba(245, 186, 20, .17), transparent 65%),
-    radial-gradient(950px 720px at 62% 52%, rgba(176, 131, 8, .10), transparent 62%),
-    #060409;
+    radial-gradient(130px 130px at 63% 55%, rgba(255, 216, 90, .55), transparent 72%),
+    radial-gradient(480px 400px at 62% 54%, rgba(245, 186, 20, .26), transparent 68%),
+    radial-gradient(1300px 950px at 62% 50%, rgba(196, 141, 12, .15), transparent 65%),
+    radial-gradient(900px 700px at 8% 96%, rgba(245, 186, 20, .07), transparent 60%),
+    #07050a;
 }
-html, body { background: #060409 !important; }
+html, body { background: #07050a !important; }
 body, .stApp, .main, [class*="css"], [data-testid="stHeader"], header { background: transparent !important; }
-section[data-testid="stSidebar"] { background: #0c0813 !important; }
+section[data-testid="stSidebar"] { background: #0d0a12 !important; }
 #MainMenu, footer, div[data-testid="stToolbar"] {visibility: hidden; height: 0;}
 
 /* ── App bar ─────────────────────────────────────────── */
@@ -81,7 +82,7 @@ section[data-testid="stSidebar"] { background: #0c0813 !important; }
   color: var(--text-2); border: 1px solid var(--bd); border-radius: 6px;
   padding: 3px 9px; background: var(--surface-1); text-transform: uppercase;
 }
-.pill .dot {width: 6px; height: 6px; border-radius: 50%; background: var(--lima);}
+.pill .dot {width: 6px; height: 6px; border-radius: 50%; background: var(--ouro); box-shadow: 0 0 6px rgba(245,184,0,.6);}
 .pill b {color: var(--text); font-weight: 500;}
 
 /* ── Rotulos micro (sistema caixa alta) ──────────────── */
@@ -105,15 +106,16 @@ section[data-testid="stSidebar"] [data-testid="stButton"] button:hover {
   background: var(--surface-2); border-color: var(--bd); color: var(--text);
 }
 section[data-testid="stSidebar"] [data-testid="stButton"] button[kind="primary"] {
-  background: var(--violeta); border-color: var(--bd-strong); color: var(--text);
-  box-shadow: rgba(0,0,0,.28) 0px 1px 3px 0px inset;
+  background: var(--ouro-fraco); border-color: rgba(245,184,0,.4); color: var(--ouro);
+  box-shadow: none;
 }
 section[data-testid="stSidebar"] [data-testid="stButton"] button[kind="primary"]:hover {
-  background: var(--violeta-forte);
+  background: rgba(245,184,0,.22);
 }
 section[data-testid="stSidebar"] [data-testid="stButton"] button[kind="secondary"]:not(:hover) {
-  padding-left: 16px; border-left: 2px solid transparent;
+  border-left: 2px solid transparent;
 }
+
 .side-kv {display: flex; justify-content: space-between; align-items: baseline;
   font-size: 12px; padding: 3px 2px;}
 .side-kv .k {color: var(--text-3); font-size: 11.5px;}
@@ -124,18 +126,18 @@ section[data-testid="stSidebar"] [data-testid="stButton"] button[kind="secondary
 
 /* ── Botoes globais (tateis, inset) ──────────────────── */
 .stButton > button {
-  background: var(--violeta); color: var(--text);
-  border: 1px solid var(--bd-strong); border-radius: 8px; padding: 6px 14px;
+  background: var(--surface-2); color: var(--text-2);
+  border: 1px solid var(--bd); border-radius: 8px; padding: 6px 14px;
   font-family: var(--ui); font-size: 12px; font-weight: 600;
   letter-spacing: .04em; box-shadow: rgba(0,0,0,.24) 0px 1px 3px 0px inset;
   transition: background .12s ease;
 }
-.stButton > button:hover {background: var(--violeta-forte); color: var(--text);}
+.stButton > button:hover {background: var(--surface-3); border-color: var(--bd-strong); color: var(--text);}
 .stButton > button[kind="primary"] {
-  background: var(--lima); color: #171226; border-color: #a8cc3a;
-  box-shadow: rgba(0,0,0,.18) 0px 1px 3px 0px inset;
+  background: var(--ouro); color: #191204; border-color: #c99700;
+  box-shadow: rgba(0,0,0,.2) 0px 1px 3px 0px inset; font-weight: 600;
 }
-.stButton > button[kind="primary"]:hover {background: #d3f56e;}
+.stButton > button[kind="primary"]:hover {background: var(--ouro-hover);}
 
 /* ── Hero ────────────────────────────────────────────── */
 .hero {padding: 6vh 0 2vh 0; max-width: 740px; margin: 0 auto;}
@@ -158,7 +160,7 @@ section[data-testid="stSidebar"] [data-testid="stButton"] button[kind="secondary
   padding: 13px 15px; margin: 0 0 14px 8%;
 }
 [data-testid="stChatMessage"]:has(> div:first-child [data-testid="chatAvatarIcon-assistant"]) {
-  border-left: 2px solid var(--roxo); padding: 2px 0 8px 16px; margin-left: 2px;
+  border-left: 2px solid var(--ouro); padding: 2px 0 8px 16px; margin-left: 2px;
 }
 [data-testid="stChatMessage"] p {font-size: 14px; line-height: 1.66; color: var(--text);}
 [data-testid="stChatMessage"] code {
@@ -178,7 +180,7 @@ section[data-testid="stSidebar"] [data-testid="stButton"] button[kind="secondary
   font-family: var(--ui) !important; font-size: 13.5px !important;
   box-shadow: rgba(0,0,0,.25) 0px 1px 4px inset !important;
 }
-div[data-testid="stChatInput"]:focus-within textarea {border-color: var(--roxo) !important;}
+div[data-testid="stChatInput"]:focus-within textarea {border-color: rgba(245,184,0,.55) !important; box-shadow: 0 0 0 3px rgba(245,184,0,.08) !important;}
 div[data-testid="stChatInput"] {border: none; background: transparent;}
 
 /* ── Rastro (trace) ──────────────────────────────────── */
@@ -199,8 +201,8 @@ div[data-testid="stChatInput"] {border: none; background: transparent;}
 .trace-row .k {flex: 0 0 72px; text-align: center; border-radius: 4px; padding: 1px 0;
   font-size: 9.5px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;}
 .tk-sql {background: rgba(124,183,255,.14); color: var(--azul);}
-.tk-rag {background: rgba(194,239,78,.12); color: var(--lima);}
-.tk-ctx {background: rgba(139,125,251,.16); color: var(--roxo-hover);}
+.tk-rag {background: rgba(245,184,0,.14); color: var(--ouro);}
+.tk-ctx {background: rgba(124,183,255,.12); color: var(--azul);}
 .tk-retry {background: rgba(255,178,135,.14); color: var(--coral);}
 .tk-erro {background: rgba(250,127,170,.14); color: var(--rosa);}
 .tk-meta {background: var(--surface-2); color: var(--text-3);}
@@ -218,7 +220,7 @@ div[data-testid="stChatInput"] {border: none; background: transparent;}
 .metric .sub {font-size: 11px; color: var(--text-3); margin-top: 6px;}
 .metric .value.warn {color: var(--coral);}
 .metric .value.crit {color: var(--rosa);}
-.metric .value.ok {color: var(--lima);}
+.metric .value.ok {color: var(--ouro);}
 .panel-h {
   font-family: var(--ui); font-size: 11px; font-weight: 600; letter-spacing: .12em;
   text-transform: uppercase; color: var(--text-2);
@@ -235,13 +237,13 @@ div[data-testid="stChatInput"] {border: none; background: transparent;}
 }
 .conv-row .titulo {flex: 1; font-size: 13px; color: var(--text); font-weight: 500;}
 .conv-row .meta {font-family: var(--mono); font-size: 10px; color: var(--text-3); letter-spacing: .04em;}
-.conv-row .ativo {border-color: var(--roxo); background: var(--surface-2);}
+.conv-row .ativo {border-color: var(--ouro); background: var(--surface-2);}
 .divider {height: 1px; background: var(--bd); margin: 20px 0;}
 
 /* ── Misc ────────────────────────────────────────────── */
 .block-container {padding: 1.3rem 1.4rem 5rem; max-width: 1100px;}
 h2 {font-size: 19px; font-weight: 600; letter-spacing: -0.015em;}
-a {color: var(--roxo-hover);}
+a {color: var(--ouro-hover);}
 [data-testid="stMetric"] {background: var(--surface-1); border: 1px solid var(--bd);
   border-radius: 10px; padding: 12px 14px;}
 [data-testid="stMetricLabel"] p {font-family: var(--ui) !important; font-size: 10px !important;
@@ -254,8 +256,8 @@ a {color: var(--roxo-hover);}
 
 LOGO_SVG = """<svg width="20" height="20" viewBox="0 0 24 24" fill="none">
 <path d="M12 2L20 5.5V11c0 5-3.4 8.9-8 11-4.6-2.1-8-6-8-11V5.5L12 2z"
- stroke="#c2ef4e" stroke-width="1.6" stroke-linejoin="round"/>
-<path d="M8.6 12l2.3 2.3 4.5-4.6" stroke="#c2ef4e" stroke-width="1.7"
+ stroke="#f5b800" stroke-width="1.6" stroke-linejoin="round"/>
+<path d="M8.6 12l2.3 2.3 4.5-4.6" stroke="#f5b800" stroke-width="1.7"
  stroke-linecap="round" stroke-linejoin="round"/>
 </svg>"""
 
