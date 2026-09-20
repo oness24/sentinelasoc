@@ -48,9 +48,13 @@ def conectar(refresh: bool = False) -> duckdb.DuckDBPyConnection:
         return con
 
 
-def _enumerar_valores(con: duckdb.DuckDBPyConnection) -> dict[str, list[str]]:
-    """Valores distintos (cardinalidade <= 10) por coluna TEXT — enums do esquema."""
-    enums: dict[str, list[str]] = {}
+def _enumerar_valores(con: duckdb.DuckDBPyConnection) -> dict[tuple[str, str], list[str]]:
+    """Valores distintos (cardinalidade <= 10) por (tabela, coluna) — enums do esquema.
+
+    Escopo por tabela e essencial: `status` vale 'Aberto' em incidentes e 'Aberta'
+    em vulnerabilidades; fundir os dois induz o LLM ao erro.
+    """
+    enums: dict[tuple[str, str], list[str]] = {}
     colunas = con.execute(
         "SELECT table_name, column_name FROM information_schema.columns "
         "WHERE table_schema = 'main' AND data_type = 'VARCHAR'"
@@ -60,15 +64,15 @@ def _enumerar_valores(con: duckdb.DuckDBPyConnection) -> dict[str, list[str]]:
             f'SELECT DISTINCT "{coluna}" FROM "{tabela}" WHERE "{coluna}" IS NOT NULL LIMIT 11'
         ).fetchall()
         if 0 < len(distintos) <= 10:  # 11+ distintos = nao e enum
-            enums[coluna] = [str(v[0]) for v in distintos]
+            enums[(tabela, coluna)] = [str(v[0]) for v in distintos]
     return enums
 
 
-_ENUM_CACHE: tuple[float, dict[str, list[str]]] | None = None
+_ENUM_CACHE: tuple[float, dict[tuple[str, str], list[str]]] | None = None
 
 
-def _enums() -> dict[str, list[str]]:
-    """Enums do esquema com cache por mtime do banco (invalida ao reconstruir)."""
+def _enums() -> dict[tuple[str, str], list[str]]:
+    """Enums (tabela, coluna) com cache por mtime do banco."""
     global _ENUM_CACHE
     s = get_settings()
     try:
@@ -113,9 +117,10 @@ def schema_descritivo() -> str:
             ).fetchall()
             partes = []
             for nome, tipo in colunas:
-                partes.append(f"{nome} {tipo.upper()}")
-                if nome in enums:
-                    partes.append(f"('{enums[nome][0]}')")
+                parte = f"{nome} {tipo.upper()}"
+                if (tabela, nome) in enums:
+                    parte += " (" + ", ".join(enums[(tabela, nome)]) + ")"
+                partes.append(parte)
             blocos.append(f"TABELA {tabela} ({total} linhas): " + " | ".join(partes))
 
         # relacionamentos por convencao <nome>_id repetido entre tabelas
@@ -138,11 +143,11 @@ def schema_descritivo() -> str:
 
     rel_linha = ("\n" + "\n".join(rels)) if rels else ""
     return (
-        "Tabelas disponiveis no DuckDB (esquema introspectado automaticamente):\n\n"
+        "Tabelas disponiveis no DuckDB (esquema introspectado automaticamente;\n"
+        "os valores entre parenteses sao os UNICOS aceitos por cada coluna — respeite\n"
+        "a tabela de origem, ex.: status de incidentes e 'Aberto', de vulnerabilidades 'Aberta'):\n\n"
         + "\n\n".join(blocos)
         + rel_linha
-        + "\n\nValores possiveis das colunas enumeraveis: "
-        + "; ".join(f"{c}: {', '.join(vs)}" for c, vs in sorted(enums.items()))
         + "\n\nDICAS IMPORTANTES:\n"
         "- Comparacoes de texto sao CASE-SENSITIVE: copie a capitalizacao EXATA dos valores acima.\n"
         "- Taxas/percentuais de um subgrupo: o DENOMINADOR deve ter o MESMO filtro do grupo\n"
@@ -157,27 +162,119 @@ class SQLBloqueadoError(ValueError):
     """Levantada quando a consulta viola a politica somente-leitura."""
 
 
+def _alias_para_tabela(sql: str) -> dict[str, str]:
+    """Mapeia alias -> tabela a partir de FROM/JOIN (ex.: 'i' -> 'incidentes')."""
+    mapa: dict[str, str] = {}
+    for m in re.finditer(
+        r"\b(?:FROM|JOIN)\s+([a-zA-Z_]\w*)(?:\s+(?:AS\s+)?([a-zA-Z_]\w*))?", sql, re.IGNORECASE
+    ):
+        tabela, alias = m.group(1), m.group(2)
+        if alias and alias.upper() not in {
+            "ON",
+            "USING",
+            "WHERE",
+            "GROUP",
+            "ORDER",
+            "LIMIT",
+            "INNER",
+            "LEFT",
+            "RIGHT",
+            "FULL",
+            "CROSS",
+            "NATURAL",
+            "SET",
+            "VALUES",
+        }:
+            mapa[alias] = tabela
+        mapa[tabela] = tabela
+    return mapa
+
+
+def _valores_validos(sql: str, qualificador: str, coluna: str) -> list[str] | None:
+    """Valores validos para a coluna no escopo da consulta (por tabela quando possivel)."""
+    enums = _enums()
+    tabelas_com_coluna = [t for (t, c) in enums if c == coluna]
+    if not tabelas_com_coluna:
+        return None
+    tabela = _alias_para_tabela(sql).get(qualificador or coluna)
+    if tabela and (tabela, coluna) in enums:
+        return enums[(tabela, coluna)]
+    if len(tabelas_com_coluna) == 1:
+        return enums[(tabelas_com_coluna[0], coluna)]
+    validos: list[str] = []
+    for t in tabelas_com_coluna:
+        validos.extend(v for v in enums[(t, coluna)] if v not in validos)
+    return validos
+
+
 def normalizar_literais(sql: str) -> str:
     """Corrige literais de texto com capitalizacao errada (ex.: 'aberta' -> 'Aberta').
 
     O LLM frequentemente gera minusculas; DuckDB e case-sensitive. Comparamos contra
-    os valores enumeraveis do proprio esquema (introspectados em _enums) e substituimos
-    apenas casamentos exatos (ignorando caixa). Literais desconhecidos sao preservados.
+    os valores enumeraveis do esquema, com escopo por tabela quando o SQL permite
+    (alias ou coluna exclusiva), e substituimos apenas casamentos exatos ignorando
+    caixa. Literais desconhecidos sao preservados.
     """
-    mapa: dict[tuple[str, str], str] = {}
-    for coluna, valores in _enums().items():
-        for valor in valores:
-            mapa[(coluna.lower(), valor.lower())] = valor
 
     def _troca(m: re.Match) -> str:
-        coluna, literal = m.group(1), m.group(2)
-        canonico = mapa.get((coluna.lower(), literal.lower()))
-        if canonico and canonico != literal:
-            log.info("db.literal.normalizado coluna=%s %r -> %r", coluna, literal, canonico)
-            return f"{coluna} = '{canonico}'"
+        prefixo, coluna, literal = m.group(1), m.group(2), m.group(3)
+        qualificador = (prefixo or "").removesuffix(".")
+        validos = _valores_validos(sql, qualificador, coluna)
+        if validos:
+            alvo = next((v for v in validos if v.lower() == literal.lower()), None)
+            if alvo and alvo != literal:
+                log.info("db.literal.normalizado coluna=%s %r -> %r", coluna, literal, alvo)
+                return f"{prefixo}{coluna} = '{alvo}'"
         return m.group(0)
 
-    return re.sub(r"(\w+)\s*=\s*'([^']*)'", _troca, sql, flags=re.IGNORECASE)
+    return re.sub(r"((?:\w+\.)?)(\w+)\s*=\s*'([^']*)'", _troca, sql, flags=re.IGNORECASE)
+
+
+def _distancia1(a: str, b: str) -> bool:
+    """Distancia de edicao <= 1 (troca/insercao/remocao de um caractere)."""
+    if a == b:
+        return True
+    if abs(len(a) - len(b)) > 1:
+        return False
+    if len(a) == len(b):
+        return sum(x != y for x, y in zip(a, b, strict=True)) <= 1
+    menor, maior = (a, b) if len(a) < len(b) else (b, a)
+    i = j = divergencias = 0
+    while i < len(menor) and j < len(maior):
+        if menor[i] == maior[j]:
+            i += 1
+            j += 1
+        else:
+            divergencias += 1
+            j += 1
+            if divergencias > 1:
+                return False
+    return True
+
+
+def literal_proximo(sql: str) -> list[tuple[str, str]]:
+    """Literais enum invalidos perto de um valor valido (distancia <= 1).
+
+    Ex.: em consulta sobre `incidentes`, status = 'Aberta' (valor de vulnerabilidades)
+    esta a um caractere de 'Aberto'. Serve para feedback de autocorrecao quando a
+    consulta retorna zero linhas.
+    """
+    achados: list[tuple[str, str]] = []
+    for m in re.finditer(r"((?:\w+\.)?)(\w+)\s*=\s*'([^']*)'", sql, re.IGNORECASE):
+        prefixo, coluna, literal = m.group(1), m.group(2), m.group(3)
+        qualificador = prefixo.removesuffix(".")
+        tabela = _alias_para_tabela(sql).get(qualificador or coluna)
+        if not tabela:
+            continue
+        enums = _enums()
+        validos = enums.get((tabela, coluna))
+        if not validos or any(v.lower() == literal.lower() for v in validos):
+            continue
+        for v in validos:
+            if _distancia1(literal.lower(), v.lower()):
+                achados.append((literal, v))
+                break
+    return achados
 
 
 def validar_sql(sql: str) -> str:

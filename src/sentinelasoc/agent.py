@@ -170,6 +170,31 @@ def _executar_sql(
             colunas, linhas = db.run_select(sql)
             log.info("sql.executed linhas=%d sql=%s", len(linhas), sql.replace("\n", " "))
             trace.append({"tipo": "sql", "sql": sql, "linhas": len(linhas)})
+            if not linhas and (proximos := db.literal_proximo(sql)):
+                literal, sugestao = proximos[0]
+                log.info("sql.enum.hint %r -> %r", literal, sugestao)
+                trace.append(
+                    {
+                        "tipo": "retry",
+                        "detalhe": (
+                            f"sql: zero linhas e literal '{literal}' nao existe na tabela"
+                            f" da consulta — valor proximo '{sugestao}'"
+                        ),
+                    }
+                )
+                mensagens.append({"role": "assistant", "content": sql})
+                mensagens.append(
+                    {
+                        "role": "user",
+                        "content": (
+                            f"A consulta retornou ZERO linhas e o valor '{literal}' nao"
+                            f" existe nessa tabela — o valor correto provavel e '{sugestao}'."
+                            " Corrija a consulta com os valores EXATOS do esquema. "
+                            'Responda SOMENTE com JSON: {"sql": "SELECT ..."}'
+                        ),
+                    }
+                )
+                continue
             if tentativa:
                 trace.append(
                     {"tipo": "direto", "decisao": f"sql autocorrigido na tentativa {tentativa + 1}"}

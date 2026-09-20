@@ -238,6 +238,36 @@ def test_normalizar_literais_corrige_caixa():
     assert normalizar_literais(sql4) == sql4
 
 
+def test_literal_proximo_detecta_genero_errado():
+    from sentinelasoc.db import literal_proximo
+
+    sql = (
+        "SELECT COUNT(*) FROM incidentes i JOIN ativos a ON i.ativo_id = a.ativo_id "
+        "WHERE i.severidade = 'Critica' AND i.status = 'Aberta'"
+    )
+    achados = literal_proximo(sql)
+    assert ("Aberta", "Aberto") in achados
+    # valor ja valido nao gera aviso
+    ok = "SELECT COUNT(*) FROM incidentes WHERE status = 'Aberto'"
+    assert literal_proximo(ok) == []
+    # escopo correto da outra tabela tambem e valido
+    ok2 = "SELECT COUNT(*) FROM vulnerabilidades WHERE status = 'Aberta'"
+    assert literal_proximo(ok2) == []
+
+
+def test_normalizar_literais_respeita_escopo_por_tabela():
+    from sentinelasoc.db import normalizar_literais
+
+    # alias qualificado: minuscula corrigida para o valor DA TABELA da consulta
+    sql = "SELECT 1 FROM incidentes i WHERE i.status = 'aberto'"
+    assert "'Aberto'" in normalizar_literais(sql)
+    sql2 = "SELECT 1 FROM vulnerabilidades v WHERE v.status = 'aberta'"
+    assert "'Aberta'" in normalizar_literais(sql2)
+    # coluna exclusiva (uma unica tabela): escopo direto
+    sql3 = "SELECT 1 FROM incidentes WHERE falso_positivo = 'sim'"
+    assert "'Sim'" in normalizar_literais(sql3)
+
+
 def test_rota_invalida_degrada_com_erro_rastreavel():
     llm = FakeLLM(
         complete_responses=["resposta completamente fora de formato"],

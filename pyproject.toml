@@ -62,6 +62,7 @@ ignore = ["SIM108"]  # ternary nem sempre melhora a leitura
 "evals/evaluate_e2e.py" = ["E501"]
 # CSS/HTML injetados na interface Streamlit
 "app.py" = ["E501"]
+"src/sentinelasoc/web/shell.py" = ["E501"]
 
 [tool.ruff.format]
 quote-style = "double"
