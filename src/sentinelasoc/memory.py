@@ -8,8 +8,9 @@ Tres camadas:
 
 import json
 import sqlite3
+from collections.abc import Iterator
+from contextlib import contextmanager
 from datetime import datetime
-from pathlib import Path
 
 from sentinelasoc.settings import get_settings
 from sentinelasoc.telemetry import get_logger
@@ -24,42 +25,53 @@ def _agora() -> str:
     return datetime.now().astimezone().isoformat(timespec="seconds")
 
 
-def _conectar() -> sqlite3.Connection:
-    caminho: Path = get_settings().memory_path
-    con = sqlite3.connect(str(caminho))
-    con.execute("PRAGMA journal_mode=WAL")
-    con.execute(
-        """
-        CREATE TABLE IF NOT EXISTS conversas (
-            id TEXT PRIMARY KEY,
-            titulo TEXT NOT NULL,
-            criada_em TEXT NOT NULL,
-            atualizada_em TEXT NOT NULL
+@contextmanager
+def _conectar() -> Iterator[sqlite3.Connection]:
+    """Conexao com fechamento garantido, WAL e busy_timeout.
+
+    O `with` nativo do sqlite3 so faz commit — nao fecha a conexao. Com sessoes
+    concorrentes do Streamlit, conexoes vagando seguravam locks e matavam o
+    script no meio do render (historico e resumos desapareciam da tela).
+    """
+    con = sqlite3.connect(str(get_settings().memory_path), timeout=15)
+    try:
+        con.execute("PRAGMA busy_timeout=15000")
+        con.execute("PRAGMA journal_mode=WAL")
+        con.execute(
+            """
+            CREATE TABLE IF NOT EXISTS conversas (
+                id TEXT PRIMARY KEY,
+                titulo TEXT NOT NULL,
+                criada_em TEXT NOT NULL,
+                atualizada_em TEXT NOT NULL
+            )
+            """
         )
-        """
-    )
-    con.execute(
-        """
-        CREATE TABLE IF NOT EXISTS mensagens (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            conversa_id TEXT NOT NULL REFERENCES conversas(id) ON DELETE CASCADE,
-            papel TEXT NOT NULL CHECK (papel IN ('user','assistant')),
-            conteudo TEXT NOT NULL,
-            trace TEXT,
-            criada_em TEXT NOT NULL
+        con.execute(
+            """
+            CREATE TABLE IF NOT EXISTS mensagens (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                conversa_id TEXT NOT NULL REFERENCES conversas(id) ON DELETE CASCADE,
+                papel TEXT NOT NULL CHECK (papel IN ('user','assistant')),
+                conteudo TEXT NOT NULL,
+                trace TEXT,
+                criada_em TEXT NOT NULL
+            )
+            """
         )
-        """
-    )
-    con.execute(
-        """
-        CREATE TABLE IF NOT EXISTS perfil (
-            fato TEXT PRIMARY KEY,
-            criado_em TEXT NOT NULL,
-            atualizado_em TEXT NOT NULL
+        con.execute(
+            """
+            CREATE TABLE IF NOT EXISTS perfil (
+                fato TEXT PRIMARY KEY,
+                criado_em TEXT NOT NULL,
+                atualizado_em TEXT NOT NULL
+            )
+            """
         )
-        """
-    )
-    return con
+        yield con
+        con.commit()
+    finally:
+        con.close()
 
 
 # ───────────────────────── Conversas ─────────────────────────

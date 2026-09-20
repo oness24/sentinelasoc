@@ -183,11 +183,14 @@ div[data-testid="stChatInput"] {border: none; background: transparent;}
 
 /* ── Rastro (trace) ──────────────────────────────────── */
 [data-testid="stExpander"] {
-  border: 1px solid var(--bd) !important; border-radius: 9px !important;
-  background: var(--deep) !important;
+  border: 1px solid var(--bd-strong) !important; border-radius: 9px !important;
+  background: var(--violeta) !important;
 }
+[data-testid="stExpander"] summary {padding: 8px 12px !important;}
+[data-testid="stExpander"] summary:hover {background: var(--surface-2) !important;
+  border-radius: 9px !important;}
 [data-testid="stExpander"] summary p {font-family: var(--mono); font-size: 11px;
-  letter-spacing: .06em; text-transform: uppercase; color: var(--text-3) !important;}
+  letter-spacing: .08em; text-transform: uppercase; color: var(--text-2) !important; font-weight: 500;}
 .trace-row {
   display: flex; gap: 10px; align-items: baseline;
   font-family: var(--mono); font-size: 11px; padding: 3px 0;
@@ -264,6 +267,18 @@ def inject_css() -> None:
     st.markdown(CSS, unsafe_allow_html=True)
 
 
+@st.cache_resource(show_spinner=False)
+def _contar_chunks() -> int:
+    """Contagem de chunks cacheada por processo: o Chroma nao e aberto a cada rerun
+    (abertura concorrente travava o render de sessoes ativas)."""
+    from sentinelasoc import rag  # import local evita ciclo
+
+    try:
+        return rag.get_collection().count()
+    except Exception:  # indicador cosmético
+        return 0
+
+
 def sidebar_shell(page: str) -> None:
     """Navegacao lateral com estado ativo e resumo de runtime."""
     st.markdown(
@@ -284,7 +299,7 @@ def sidebar_shell(page: str) -> None:
             st.query_params["page"] = chave
             st.rerun()
 
-    from sentinelasoc import memory, rag  # import local evita ciclo
+    from sentinelasoc import memory  # import local evita ciclo
 
     st.markdown("<div class='side-h microlabel'>Runtime</div>", unsafe_allow_html=True)
     st.markdown(
@@ -297,10 +312,7 @@ def sidebar_shell(page: str) -> None:
         unsafe_allow_html=True,
     )
     st.markdown("<div class='side-h microlabel'>Base</div>", unsafe_allow_html=True)
-    try:
-        chunks = rag.get_collection().count()
-    except Exception:  # indicador cosmético
-        chunks = 0
+    chunks = _contar_chunks()
     st.markdown(
         f"<div class='side-kv'><span class='k'>Chunks</span><span class='v'>{chunks}</span></div>"
         f"<div class='side-kv'><span class='k'>Conversas</span>"

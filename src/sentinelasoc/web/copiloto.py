@@ -97,6 +97,7 @@ def render() -> None:
     if "perfil_fatos" not in st.session_state:
         st.session_state.perfil_fatos = memory.fatos_perfil()
 
+    _botao_nova_conversa()
     agente = _agente()
 
     # ── Estado vazio: hero + sugestoes ──
@@ -201,4 +202,12 @@ def render() -> None:
     nova = st.chat_input("Pergunte sobre políticas, incidentes, ativos ou vulnerabilidades…")
     if nova:
         st.session_state.pergunta_pendente = nova
+        st.rerun()
+
+
+def _botao_nova_conversa() -> None:
+    """Acao rapida de recomeco (encerra a conversa corrente sem apagar o historico)."""
+    if st.session_state.get("mensagens") and st.button("Nova conversa", key="nova_conversa"):
+        st.session_state.mensagens = []
+        st.session_state.conversa_id = None
         st.rerun()
