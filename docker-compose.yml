@@ -8,4 +8,9 @@ services:
       - "8501:8501"
     env_file:
       - .env   # OPENAI_API_KEY (criar a partir de .env.example)
+    # Linux: permite que o container alcance o Ollama do host via host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
+    # Para backend Ollama no host, use no .env:
+    #   OPENAI_BASE_URL=http://host.docker.internal:11434/v1
