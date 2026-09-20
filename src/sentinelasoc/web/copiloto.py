@@ -22,10 +22,11 @@ def _avatar(svg: str) -> str:
 
 
 AV_ASSISTENTE = _avatar(
-    """<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'
+    """<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'
  fill='none'><rect width='28' height='28' rx='7' fill='#241d10'/>
-<path d='M12 4l6.5 2.8v4.4c0 4-2.7 7.1-6.5 8.8-3.8-1.7-6.5-4.8-6.5-8.8V6.8L12 4z'
- stroke='#f5b800' stroke-width='1.5'/></svg>"""
+<circle cx='14' cy='14' r='9' fill='#f5b800' opacity='.15'/>
+<path d='M14 5 Q15.7 12.3 23 14 Q15.7 15.7 14 23 Q12.3 15.7 5 14 Q12.3 12.3 14 5 Z'
+ fill='#f5b800'/><circle cx='14' cy='14' r='1.5' fill='#fff3c4'/></svg>"""
 )
 AV_USUARIO = _avatar(
     """<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'

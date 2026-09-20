@@ -69,8 +69,9 @@ section[data-testid="stSidebar"] { background: #0d0a12 !important; }
 /* ── App bar ─────────────────────────────────────────── */
 .appbar {
   display: flex; align-items: center; gap: 14px; height: 50px;
-  padding: 0 6px 0 22px; margin: -1rem -1.2rem 1.1rem -1.2rem;
+  padding: 0 6px 0 22px; margin: 0 0 1.1rem;
   border-bottom: 1px solid var(--bd); background: var(--deep);
+  border-radius: 10px 10px 0 0;
 }
 .appbar .brand {display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px;}
 .appbar .crumb {color: var(--text-3); font-size: 12.5px;}
@@ -241,7 +242,7 @@ div[data-testid="stChatInput"] {border: none; background: transparent;}
 .divider {height: 1px; background: var(--bd); margin: 20px 0;}
 
 /* ── Misc ────────────────────────────────────────────── */
-.block-container {padding: 1.3rem 1.4rem 5rem; max-width: 1100px;}
+.block-container {padding: 0 1.4rem 5rem; max-width: 1100px;}
 h2 {font-size: 19px; font-weight: 600; letter-spacing: -0.015em;}
 a {color: var(--ouro-hover);}
 [data-testid="stMetric"] {background: var(--surface-1); border: 1px solid var(--bd);
@@ -254,11 +255,12 @@ a {color: var(--ouro-hover);}
 </style>
 """
 
+# Marca Quimera: o clarao dourado da imagem de referencia, geometrico (4 pontas + nucleo)
 LOGO_SVG = """<svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-<path d="M12 2L20 5.5V11c0 5-3.4 8.9-8 11-4.6-2.1-8-6-8-11V5.5L12 2z"
- stroke="#f5b800" stroke-width="1.6" stroke-linejoin="round"/>
-<path d="M8.6 12l2.3 2.3 4.5-4.6" stroke="#f5b800" stroke-width="1.7"
- stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="12" cy="12" r="9.5" fill="#f5b800" opacity=".14"/>
+<path d="M12 2.5 Q13.6 10.4 21.5 12 Q13.6 13.6 12 21.5 Q10.4 13.6 2.5 12 Q10.4 10.4 12 2.5 Z"
+ fill="#f5b800"/>
+<circle cx="12" cy="12" r="1.4" fill="#fff3c4"/>
 </svg>"""
 
 
