@@ -27,6 +27,28 @@ from sentinelasoc.telemetry import get_logger, request_context, timed
 log = get_logger(__name__)
 MAX_HISTORIA = 6
 
+# Perguntas que exigem razao (divisao) na consulta
+_RE_TAXA = re.compile(r"\b(taxa|percentual|propor[cç][ãa]o|porcentagem)\b", re.IGNORECASE)
+
+
+def _exige_razao(pergunta: str, sql: str) -> bool:
+    """Heuristica: pergunta pede taxa/percentual mas o SQL nao calcula divisao alguma."""
+    return bool(_RE_TAXA.search(pergunta)) and "/" not in sql
+
+
+def _denominador_suspeito(sql: str) -> bool:
+    """Heuristica: numerador filtra um grupo (2+ condicoes no CASE) mas o denominador
+    e um COUNT(*) sem filtro — razao com escopo errado."""
+    if "/" not in sql or "COUNT(*)" not in sql.upper():
+        return False
+    denominador_limpo = re.sub(r"\s+", "", sql.upper()).count("/COUNT(*)")
+    if not denominador_limpo:
+        return False
+    caso = re.search(r"CASE WHEN ([^)]+)", sql, re.IGNORECASE)
+    if not caso:
+        return False
+    return caso.group(1).upper().count(" AND ") >= 1
+
 
 def extrair_json(texto: str) -> dict:
     """Extrai o primeiro objeto JSON valido de uma resposta do LLM."""
@@ -80,7 +102,9 @@ def _reformular(pergunta: str, history: list[dict], cliente: LLMClient) -> str:
     return independente or pergunta
 
 
-def _executar_sql(pergunta: str, trace: list[dict], cliente: LLMClient, history: list[dict]) -> str:
+def _executar_sql(
+    pergunta: str, trace: list[dict], cliente: LLMClient, history: list[dict], original: str = ""
+) -> str:
     """Gera SQL via LLM, valida contra o guarda somente-leitura e executa no DuckDB.
 
     Auto-correcao: erros de execucao (coluna inexistente, sintaxe) sao devolvidos
@@ -95,8 +119,52 @@ def _executar_sql(pergunta: str, trace: list[dict], cliente: LLMClient, history:
     ]
     ultimo_erro: Exception | None = None
     for tentativa in range(3):
-        plano = extrair_json(cliente.complete(mensagens, temperature=0.0))
-        sql = str(plano["sql"]).strip()
+        try:
+            plano = extrair_json(cliente.complete(mensagens, temperature=0.0))
+            sql = str(plano["sql"]).strip()
+        except (ValueError, KeyError) as exc:  # JSON malformado: tenta novamente
+            ultimo_erro = exc
+            log.warning("sql.retry tentativa=%d erro_json=%s", tentativa + 1, exc)
+            trace.append(
+                {"tipo": "retry", "detalhe": f"sql json (tentativa {tentativa + 1}): {exc}"}
+            )
+            mensagens.append(
+                {
+                    "role": "user",
+                    "content": (
+                        "A resposta anterior nao foi um JSON valido. "
+                        'Responda SOMENTE com JSON: {"sql": "SELECT ..."}'
+                    ),
+                }
+            )
+            continue
+        if _exige_razao(f"{original} {pergunta}", sql) or _denominador_suspeito(sql):
+            motivo = (
+                "pergunta pede taxa, consulta nao divide"
+                if _exige_razao(f"{original} {pergunta}", sql)
+                else "denominador sem o filtro do grupo"
+            )
+            trace.append(
+                {
+                    "tipo": "retry",
+                    "detalhe": (f"sql (tentativa {tentativa + 1}): {motivo}"),
+                }
+            )
+            mensagens.append({"role": "assistant", "content": sql})
+            mensagens.append(
+                {
+                    "role": "user",
+                    "content": (
+                        "A pergunta pede uma TAXA/PERCENTUAL, mas a consulta acima nao calcula"
+                        " divisao alguma, ou divide pelo escopo errado. A razao deve usar o"
+                        " MESMO escopo da pergunta (ex.: taxa DE falsos positivos DE Forca Bruta"
+                        " = falsos positivos de Forca Bruta / total de incidentes de Forca Bruta),"
+                        " na forma 100.0 * SUM(CASE WHEN cond THEN 1 ELSE 0 END) / COUNT(*). "
+                        'Responda SOMENTE com JSON: {"sql": "SELECT ..."}'
+                    ),
+                }
+            )
+            continue
         try:
             colunas, linhas = db.run_select(sql)
             log.info("sql.executed linhas=%d sql=%s", len(linhas), sql.replace("\n", " "))
@@ -287,6 +355,7 @@ class AgenteSOC:
                                 trace,
                                 cliente,
                                 history,
+                                original=pergunta_efetiva,
                             )
                         )
                     elif tipo == "rag":

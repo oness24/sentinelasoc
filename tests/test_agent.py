@@ -192,6 +192,52 @@ def test_extrair_fatos_parseia_e_falha_graciosamente():
     assert agente_ruim.extrair_fatos("p", "r") == []
 
 
+def test_exige_razao_detecta_count_sem_divisao():
+    from sentinelasoc.agent import _exige_razao
+
+    assert _exige_razao("Qual a taxa de falsos positivos?", "SELECT COUNT(*) FROM t")
+    assert _exige_razao("percentual por tipo", "SELECT COUNT(*) FROM t")
+    assert not _exige_razao("quantos incidentes?", "SELECT COUNT(*) FROM t")
+    assert not _exige_razao("qual a taxa?", "SELECT 100.0*SUM(x)/COUNT(*) FROM t")
+
+
+def test_denominador_suspeito_detecta_escopo_errado():
+    from sentinelasoc.agent import _denominador_suspeito
+
+    errada = (
+        "SELECT 100.0 * SUM(CASE WHEN tipo = 'Forca Bruta' AND falso_positivo = 'Sim' "
+        "THEN 1 ELSE 0 END) / COUNT(*) FROM incidentes"
+    )
+    certa = (
+        "SELECT 100.0 * SUM(CASE WHEN tipo = 'Forca Bruta' AND falso_positivo = 'Sim' "
+        "THEN 1 ELSE 0 END) / SUM(CASE WHEN tipo = 'Forca Bruta' THEN 1 ELSE 0 END) FROM incidentes"
+    )
+    simples = (
+        "SELECT 100.0 * SUM(CASE WHEN falso_positivo = 'Sim' THEN 1 ELSE 0 END) "
+        "/ COUNT(*) FROM incidentes"
+    )
+    assert _denominador_suspeito(errada)
+    assert not _denominador_suspeito(certa)
+    assert not _denominador_suspeito(simples)
+    assert not _denominador_suspeito("SELECT COUNT(*) FROM incidentes")
+
+
+def test_normalizar_literais_corrige_caixa():
+    from sentinelasoc.db import normalizar_literais
+
+    sql = "SELECT COUNT(*) FROM vulnerabilidades WHERE cvss >= 9.0 AND status = 'aberta'"
+    assert "'Aberta'" in normalizar_literais(sql)
+    sql2 = "SELECT * FROM incidentes WHERE tipo = 'forca bruta' AND severidade = 'critica'"
+    norm = normalizar_literais(sql2)
+    assert "'Forca Bruta'" in norm and "'Critica'" in norm
+    # literais desconhecidos permanecem
+    sql3 = "SELECT * FROM ativos WHERE hostname = 'srv-x'"
+    assert normalizar_literais(sql3) == sql3
+    # valores ja corretos nao mudam
+    sql4 = "SELECT * FROM incidentes WHERE status = 'Aberto'"
+    assert normalizar_literais(sql4) == sql4
+
+
 def test_rota_invalida_degrada_com_erro_rastreavel():
     llm = FakeLLM(
         complete_responses=["resposta completamente fora de formato"],

@@ -70,11 +70,66 @@ TABELA vulnerabilidades (falhas detectadas nos ativos):
   data_deteccao DATE | status TEXT ('Aberta','Em correcao','Corrigida') | prazo_sla_dias INTEGER
 
 Relacionamentos: incidentes.ativo_id -> ativos.ativo_id; vulnerabilidades.ativo_id -> ativos.ativo_id.
-Datas no formato DATE 'YYYY-MM-DD'. Hoje e 2026-09-20."""
+Datas no formato DATE 'YYYY-MM-DD'. Hoje e 2026-09-20.
+
+DICAS IMPORTANTES:
+- A coluna severidade existe SOMENTE em incidentes. A criticidade de uma vulnerabilidade
+  e expressa pelo cvss (critica = cvss >= 9.0; alta = cvss >= 7.0).
+- Comparacoes de texto sao CASE-SENSITIVE: copie a capitalizacao EXATA dos valores listados
+  acima (ex.: status = 'Aberta', NUNCA 'aberta'; severidade = 'Critica').
+- Taxas/percentuais de um subgrupo: o DENOMINADOR deve ter o MESMO filtro do grupo
+  perguntado. Forma segura: 100.0 * SUM(CASE WHEN <grupo> AND <condicao> THEN 1 ELSE 0 END)
+  / SUM(CASE WHEN <grupo> THEN 1 ELSE 0 END) — nunca divida por COUNT(*) sem o filtro do grupo.
+- 'Agora'/'abertos agora' = status IN ('Aberto','Em atendimento')."""
 
 
 class SQLBloqueadoError(ValueError):
     """Levantada quando a consulta viola a politica somente-leitura."""
+
+
+# Valores enumeraveis por coluna (para normalizacao de literais gerados por LLM)
+_VALORES_COLUNA: dict[str, list[str]] = {
+    "status": ["Aberto", "Em atendimento", "Resolvido", "Aberta", "Em correcao", "Corrigida"],
+    "severidade": ["Critica", "Alta", "Media", "Baixa"],
+    "criticidade": ["Alta", "Media", "Baixa"],
+    "ambiente": ["Producao", "Homologacao", "DMZ"],
+    "exposto_internet": ["Sim", "Nao"],
+    "falso_positivo": ["Sim", "Nao"],
+    "tipo": [
+        "Phishing",
+        "Forca Bruta",
+        "Malware",
+        "DDoS",
+        "Exfiltracao de Dados",
+        "Acesso Anomalo",
+        "Vulnerabilidade Explorada",
+        "Engenharia Social",
+    ],
+}
+
+
+def normalizar_literais(sql: str) -> str:
+    """Corrige literais de texto com capitalizacao errada (ex.: 'aberta' -> 'Aberta').
+
+    O LLM frequentemente gera minusculas; DuckDB e case-sensitive. Comparamos contra
+    os valores enumeraveis conhecidos do esquema e substituimos apenas casamentos exatos
+    (ignorando caixa). Literais desconhecidos sao preservados.
+    """
+    mapa = {
+        (coluna, valor.lower()): valor
+        for coluna, valores in _VALORES_COLUNA.items()
+        for valor in valores
+    }
+
+    def _troca(m: re.Match) -> str:
+        coluna, literal = m.group(1), m.group(2)
+        canonico = mapa.get((coluna.lower(), literal.lower()))
+        if canonico and canonico != literal:
+            log.info("db.literal.normalizado coluna=%s %r -> %r", coluna, literal, canonico)
+            return f"{coluna} = '{canonico}'"
+        return m.group(0)
+
+    return re.sub(r"(\w+)\s*=\s*'([^']*)'", _troca, sql, flags=re.IGNORECASE)
 
 
 def validar_sql(sql: str) -> str:
@@ -98,6 +153,7 @@ def run_select(sql: str) -> tuple[list[str], list[tuple]]:
     """Executa uma consulta validada e devolve (colunas, linhas), com limite de linhas."""
     s = get_settings()
     consulta = validar_sql(sql)
+    consulta = normalizar_literais(consulta)
     con = conectar()
     try:
         cur = con.execute(f"SELECT * FROM ({consulta}) _consulta LIMIT {s.sql_max_rows}")

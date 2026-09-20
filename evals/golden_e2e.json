@@ -1,0 +1,85 @@
+{
+  "descricao": "Golden set end-to-end: pergunta -> fatos esperados na resposta final. Casos SQL trazem consulta de referencia executada ao vivo para derivar os numeros esperados.",
+  "casos": [
+    {
+      "id": "anpd",
+      "pergunta": "Qual o prazo para comunicar a ANPD em um incidente com dados pessoais?",
+      "tipo": "rag",
+      "ferramentas_esperadas": ["rag"],
+      "doc_esperado": "playbook_resposta_incidentes.md",
+      "fatos": ["prazo de 2 dias úteis", "Resolução CD/ANPD 15/2024"]
+    },
+    {
+      "id": "senha",
+      "pergunta": "Quantos caracteres deve ter uma senha e quais os requisitos?",
+      "tipo": "rag",
+      "ferramentas_esperadas": ["rag"],
+      "doc_esperado": "politica_de_seguranca.md",
+      "fatos": ["mínimo 12 caracteres", "letras maiúsculas, minúsculas, números e símbolos"]
+    },
+    {
+      "id": "sla_cvss",
+      "pergunta": "Qual o SLA de correção para uma CVE com CVSS 9.5 em ativo exposto?",
+      "tipo": "rag",
+      "ferramentas_esperadas": ["rag"],
+      "doc_esperado": "guia_gestao_vulnerabilidades.md",
+      "fatos": ["7 dias", "classificação Crítica"]
+    },
+    {
+      "id": "phishing_passos",
+      "pergunta": "Quais os passos para responder um incidente de phishing?",
+      "tipo": "rag",
+      "ferramentas_esperadas": ["rag"],
+      "doc_esperado": "playbook_resposta_incidentes.md",
+      "fatos": ["triagem com remetente, domínio, URL e hashes", "bloqueio no gateway de e-mail e proxy", "monitorar por 7 dias"]
+    },
+    {
+      "id": "janela_prod",
+      "pergunta": "Qual é a janela de correção em produção?",
+      "tipo": "rag",
+      "ferramentas_esperadas": ["rag"],
+      "doc_esperado": "guia_gestao_vulnerabilidades.md",
+      "fatos": ["terças-feiras", "das 22h às 2h"]
+    },
+    {
+      "id": "criticos_abertos",
+      "pergunta": "Quantos incidentes críticos estão abertos agora?",
+      "tipo": "sql",
+      "ferramentas_esperadas": ["sql"],
+      "sql_referencia": "SELECT COUNT(*) AS n FROM incidentes WHERE severidade='Critica' AND status='Aberto'",
+      "fatos_template": ["{n} incidentes críticos abertos"]
+    },
+    {
+      "id": "fp_forca_bruta",
+      "pergunta": "Qual a taxa de falsos positivos de incidentes de Força Bruta?",
+      "tipo": "sql",
+      "ferramentas_esperadas": ["sql"],
+      "sql_referencia": "SELECT ROUND(100.0*SUM(CASE WHEN falso_positivo='Sim' THEN 1 ELSE 0 END)/COUNT(*),1) AS pct FROM incidentes WHERE tipo='Forca Bruta'",
+      "fatos_template": ["taxa de falsos positivos de Força Bruta em torno de {pct}%"]
+    },
+    {
+      "id": "dmz_expostos",
+      "pergunta": "Quantos ativos estão expostos à internet?",
+      "tipo": "sql",
+      "ferramentas_esperadas": ["sql"],
+      "sql_referencia": "SELECT COUNT(*) AS n FROM ativos WHERE exposto_internet='Sim'",
+      "fatos_template": ["{n} ativos expostos à internet"]
+    },
+    {
+      "id": "vulns_criticas",
+      "pergunta": "Quantas vulnerabilidades críticas ainda estão abertas?",
+      "tipo": "sql",
+      "ferramentas_esperadas": ["sql"],
+      "sql_referencia": "SELECT COUNT(*) AS n FROM vulnerabilidades WHERE cvss>=9.0 AND status='Aberta'",
+      "fatos_template": ["{n} vulnerabilidades críticas abertas"]
+    },
+    {
+      "id": "incidentes_2026",
+      "pergunta": "Quantos incidentes foram registrados em 2026?",
+      "tipo": "sql",
+      "ferramentas_esperadas": ["sql"],
+      "sql_referencia": "SELECT COUNT(*) AS n FROM incidentes WHERE data_abertura >= DATE '2026-01-01'",
+      "fatos_template": ["{n} incidentes registrados em 2026"]
+    }
+  ]
+}

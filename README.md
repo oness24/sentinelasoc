@@ -127,6 +127,29 @@ The default model was chosen by this benchmark — smaller, faster and more accu
 the golden set. Both reach 100% hit@3, and production retrieves top-4, so the correct
 chunk always reaches the LLM context.
 
+### End-to-end (final answers, LLM-as-judge)
+
+`python evals/evaluate_e2e.py --runs 3` runs the **full agent** (routing → tools → answer)
+on 10 golden questions, 3 runs each. A local-LLM judge (temperature 0) scores fact
+coverage and hallucination; SQL answers are verified against reference queries executed
+live (`evals/report_e2e.md`):
+
+| Metric | Result (3-run mean) |
+|---|---|
+| Fact coverage | 86% |
+| Correct routing | 90% |
+| Correct document citation | 100% |
+| Hallucination rate | 0% |
+| Judge score (1–5) | 4.5 |
+| Latency per answer | ~4.6s |
+
+Running this harness against a 7B model surfaced real failure modes, fixed with
+deterministic guards (all unit-tested): ratio-scope lints for rate questions,
+schema-enum literal normalization (`'aberta'` → `'Aberta'`), malformed-JSON retry
+resilience, and router intent-preservation rules. Remaining variance on ambiguous
+aggregate questions is a documented 7B limitation — the natural upgrade is a 14B-class
+local model.
+
 ## Security
 
 - **Read-only SQL guard in code, not prompt**: anything that isn't a single

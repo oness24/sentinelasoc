@@ -22,7 +22,8 @@ Responda SOMENTE com um JSON valido, sem texto adicional, em um destes formatos:
 {"acao": "consultar", "ferramentas": [{"tipo": "sql", "pergunta": "..."}, {"tipo": "rag", "consulta": "..."}]}
 {"acao": "direto", "resposta": "..."}
 
-Use "direto" apenas para conversa social (saudacao, agradecimento) ou explicacao generica do que voce faz. Perguntas factuais do dominio SEMPRE usam ferramentas. No maximo 1 chamada de cada tipo."""
+Use "direto" apenas para conversa social (saudacao, agradecimento) ou explicacao generica do que voce faz. Perguntas factuais do dominio SEMPRE usam ferramentas. No maximo 1 chamada de cada tipo.
+Ao formular a pergunta/consulta de cada ferramenta, PRESERVE exatamente a intencao e o vocabulario do analista (se ele pediu taxa, peca taxa; se pediu "abertas", use abertas; se pediu contagem, peca contagem) — apenas a torne autonoma do historico."""
 
 SQL_PROMPT = """Voce e o gerador de SQL do SentinelaSOC. Escreva UMA consulta DuckDB (dialeto PostgreSQL-like) que responda a pergunta do analista.
 
@@ -33,6 +34,9 @@ REGRAS:
 - Datas como DATE 'YYYY-MM-DD'. Hoje e DATE '2026-09-20'.
 - Sem ponto e virgula no final. Uma unica declaracao.
 - Para medias de horas_para_resolver, filtre por status='Resolvido'; AVG ja ignora NULLs (nao use NULLIF para isso).
+- Perguntas com "quantos/quanta" pedem uma CONTAGEM (COUNT) do predicado exato da pergunta — nao liste registros.
+- Taxas e percentuais: 100.0 * SUM(CASE WHEN condicao THEN 1 ELSE 0 END) / COUNT(*).
+- Perguntas com "taxa", "percentual" ou "proporção" exigem uma RAZÃO (divisão) — nunca responda com COUNT simples.
 - Quando util, arredonde valores numericos (ROUND(x, 1)).
 
 Responda SOMENTE com JSON valido: {{"sql": "SELECT ..."}}"""

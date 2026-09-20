@@ -29,6 +29,9 @@ typecheck:          ## mypy
 eval:               ## benchmark RAG no golden set
 	./venv/bin/python evals/evaluate.py
 
+eval-e2e:           ## avaliacao end-to-end com juiz LLM (3 corridas)
+	./venv/bin/python evals/evaluate_e2e.py --runs 3
+
 docker-build:       ## constroi a imagem de producao
 	docker build -f docker/Dockerfile -t sentinelasoc .
 
