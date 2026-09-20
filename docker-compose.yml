@@ -1,0 +1,11 @@
+services:
+  sentinelasoc:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: sentinelasoc:latest
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env   # OPENAI_API_KEY (criar a partir de .env.example)
+    restart: unless-stopped
