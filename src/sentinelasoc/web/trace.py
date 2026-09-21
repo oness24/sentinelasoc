@@ -22,6 +22,11 @@ def formatar_evento(item: dict) -> tuple[str, str] | None:
     if tipo == "rag":
         consulta = str(item.get("consulta", ""))[:60]
         return "rag", f"consulta: {consulta} · {item.get('chunks', 0)} trechos"
+    if tipo == "ml":
+        filtro = str(item.get("filtro", ""))[:60]
+        prob = item.get("prob_media")
+        prev = f"{float(prob):.0f}%" if isinstance(prob, (int, float)) else "—"
+        return "ml", f"filtro: {filtro} · {item.get('incidentes', 0)} incidentes · FP médio {prev}"
     if tipo == "ctx":
         return "ctx", f"seguimento reformulado → {str(item.get('reescrita', ''))[:90]}"
     if tipo in ("retry", "erro"):

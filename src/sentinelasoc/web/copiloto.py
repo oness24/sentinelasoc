@@ -48,6 +48,7 @@ def _renderizar_trace(trace: list[dict]) -> None:
     classes = {
         "sql": "tk-sql",
         "rag": "tk-rag",
+        "ml": "tk-ml",
         "ctx": "tk-ctx",
         "retry": "tk-retry",
         "erro": "tk-erro",

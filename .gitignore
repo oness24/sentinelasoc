@@ -19,6 +19,8 @@ chroma_db/
 soc.duckdb
 sentinelasoc.db*
 evals/chroma_tmp_*/
+models/
+data/nsl_kdd/
 
 # Streamlit
 .streamlit/secrets.toml

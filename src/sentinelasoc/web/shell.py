@@ -39,6 +39,7 @@ CSS = """
   --coral: #ffb287;
   --rosa: #fa7faa;
   --azul: #7cb7ff;
+  --violeta: #b7a7f7;
   --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
   --ui: 'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
@@ -202,6 +203,7 @@ div[data-testid="stChatInput"] {border: none; background: transparent;}
   font-size: 9.5px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;}
 .tk-sql {background: rgba(124,183,255,.14); color: var(--azul);}
 .tk-rag {background: rgba(245,184,0,.14); color: var(--ouro);}
+.tk-ml {background: rgba(183,167,247,.15); color: var(--violeta);}
 .tk-ctx {background: rgba(124,183,255,.12); color: var(--azul);}
 .tk-retry {background: rgba(255,178,135,.14); color: var(--coral);}
 .tk-erro {background: rgba(250,127,170,.14); color: var(--rosa);}
@@ -385,7 +387,9 @@ def sidebar_shell(page: str) -> None:
         "<div class='side-kv'><span class='k'>Embeddings</span>"
         "<span class='v'>MiniLM-L12</span></div>"
         "<div class='side-kv'><span class='k'>Recuperação</span>"
-        "<span class='v'>híbrida BM25+vetor</span></div>",
+        "<span class='v'>híbrida BM25+vetor</span></div>"
+        "<div class='side-kv'><span class='k'>ML</span>"
+        "<span class='v'>FP · LogisticRegression</span></div>",
         unsafe_allow_html=True,
     )
     st.markdown("<div class='side-h microlabel'>Base</div>", unsafe_allow_html=True)

@@ -37,6 +37,7 @@ flowchart LR
 | 8 | **Memória em 3 camadas (SQLite)** | estado só em sessão; vetorstore como memória | Episódica (conversas retomáveis) + semântica (fatos do analista, com teto/dedup e visíveis/apagáveis). Local, sem serviço externo |
 | 9 | **Reescrita de seguimentos antes de rotear** | passar o histórico cru às ferramentas | Follow-ups viram perguntas autônomas (auditáveis no trace) antes de SQL/RAG — padrão consolidado de RAG conversacional |
 | 10 | **Recuperação híbrida (vetores + BM25, fusão RRF)** | apenas vetores | Embeddings borram identificadores exatos (T1566, '15/2024', KEV); BM25 cobre o léxico e a fusão reciprocal rank soma os dois (hit@1 93%→100% no golden ampliado). Índice lazy espelhado do ChromaDB, degradação graciosa |
+| 11 | **ML como ferramenta determinística do roteador** (`ml`) | LLM "prever" na resposta final; endpoint de modelo separado | O classificador (scikit-learn, artefato joblib regenerável por seed) roda local e determinístico; o LLM só interpreta. Filtro por tipo/severidade/ambiente é casamento lexical sem LLM (auditável), e a métrica do modelo acompanha a resposta — o teto de Bayes do rótulo é publicado em `evals/report_ml.md` para separar modelo fraco de problema ruidoso |
 
 ## Modelo de dados
 

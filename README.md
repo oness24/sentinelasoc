@@ -31,11 +31,12 @@ citations, streaming, and a full audit trail of which tools ran and why.
 | "Qual o prazo para comunicar a ANPD em incidente com dados pessoais?" | RAG | Playbook §5.5/§7 — 2 dias úteis (Resolução CD/ANPD 15/2024), citing document + section |
 | "Quantos incidentes críticos estão abertos e em quais ativos?" | SQL | Generated DuckDB query over `incidentes ⋈ ativos`, summarized |
 | "Qual o SLA de correção para uma CVE com CVSS 9.5 em ativo exposto?" | RAG + SQL | Guia de Gestão §3 (7 dias) **and** how many such CVEs are currently open |
+| "Qual a probabilidade de falso positivo nos incidentes de phishing?" | ML | Trained classifier scores every matching incident; answer ranks the most likely FPs with per-severity means and model metrics |
 | "Apague todos os incidentes" | SQL (blocked) | Read-only guard rejects it; response explains the policy |
 
 Every answer ships with a **trace panel**: the routing decision, the exact SQL executed
-and row count, the retrieved document sections with similarity distances, and per-stage
-latency. No black-box answers.
+and row count, the retrieved document sections with similarity distances, ML filter +
+mean predicted probability, and per-stage latency. No black-box answers.
 
 ## Architecture
 
@@ -46,9 +47,11 @@ flowchart LR
     AG --> RT{Router LLM\nJSON, temp 0}
     RT -->|policy / procedure| RAG[ChromaDB RAG\ndocs/*.md · 48 chunks]
     RT -->|numbers / trends| SQL[NL → SQL generator\n+ read-only guard]
+    RT -->|FP risk / triage| ML[FP predictor\nscikit-learn · joblib]
     RT -->|small talk| D[Direct answer]
     RAG --> FIN[Final answer\nstreaming · citations]
     SQL --> FIN
+    ML --> FIN
     FIN --> UI
     subgraph Data layer
       CSV[(3 related CSVs)] --> DUCK[(DuckDB)]
@@ -126,6 +129,22 @@ per-model indexes (`evals/golden.json`, `evals/report.md`):
 The default model was chosen by this benchmark — smaller, faster and more accurate on
 the golden set. Both reach 100% hit@3, and production retrieves top-4, so the correct
 chunk always reaches the LLM context.
+
+### ML layer (false-positive triage + NSL-KDD)
+
+Two classifiers, both reproducible (fixed seeds), reported in `evals/report_ml.md`
+(run `make download-nsl && make train-ml`):
+
+| Model | Purpose | Result |
+|---|---|---|
+| LogisticRegression (FP predictor, `ml` tool) | rank SOC incidents by false-positive probability | AUC 72.8% vs **Bayes ceiling 77.3%** — the synthetic label is noisy by construction (severity-dependent draw); the model reaches ~94% of what is theoretically achievable |
+| HistGradientBoosting (NSL-KDD, public IDS benchmark) | attack vs normal on `KDDTest+` (unseen attack types) | AUC 96.1% · F1 79.6% · accuracy 80.3% |
+
+The FP tool answers questions like *"qual a probabilidade de falso positivo nos
+incidentes de phishing?"*: it deterministically filters incidents by lexical match
+(no LLM in the filter), scores each one, and the answer ranks the most likely FPs with
+per-severity means plus the model's own metrics — prediction supports prioritization,
+the closing decision stays with the analyst.
 
 ### Hybrid retrieval (vectors + BM25)
 
@@ -206,10 +225,10 @@ job runs the RAG suite locally-seeded.
 
 ## Roadmap
 
-- [ ] False-positive classifier for incident triage (labels already in `incidentes.csv`)
-- [ ] Autonomous agents: ticket actions and analyst notifications
-- [ ] LLM-as-judge faithfulness scoring in the eval harness
-- [ ] Hybrid retrieval (BM25 + vectors) and reranking
+- [x] False-positive classifier for incident triage (`ml` tool — `evals/report_ml.md`)
+- [ ] Specialized agent crew: evidence collector + drafter in the same chat
+- [ ] LLM-call observability panel (latency, tokens, retries per request)
+- [ ] Prompt-injection red-team corpus in the eval harness
 - [ ] Optional auth layer (OIDC) for multi-user deployments
 
 ## License

@@ -12,7 +12,7 @@ import json
 import re
 from collections.abc import Iterator
 
-from sentinelasoc import db, rag
+from sentinelasoc import db, ml, rag
 from sentinelasoc.llm import LLMClient, OpenAILLMClient
 from sentinelasoc.prompts import (
     FACTS_PROMPT,
@@ -258,6 +258,112 @@ def _executar_rag(consulta: str, trace: list[dict]) -> str:
     return f"Trechos dos documentos internos recuperados por busca semantica:\n\n{trechos}"
 
 
+# Intencao de previsao ML: pergunta pede probabilidade/risco de falso positivo
+_RE_PREVISAO_FP = re.compile(
+    r"\b(probabilidad\w*|previs\w*|chance|risco|prioriz\w*|tend[eê]ncia|estim\w*)\b"
+    r".*\bfalsos? positiv\w*"
+    r"|\bfalsos? positiv\w*.*\b(probabilidad\w*|previs\w*|chance|risco|qual|quais)\b"
+    # "quais ... PODEM SER falso positivo?" — modalidade indica previsao, nao fato
+    r"|\b(quais|qual)\b.*\b(podem|poderiam|potencia\w*|prov[áa]ve\w*|candidat\w*)\b"
+    r".*\bfalsos? positiv\w*",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def _executar_ml(consulta: str, trace: list[dict]) -> str:
+    """Aplica o preditor de falso positivo aos incidentes que casam com a consulta.
+
+    O filtro e deterministico (sem LLM): valores reais de tipo/severidade/
+    ambiente/tatica e o termo "exposto" sao casados sem acento na consulta.
+    Sem filtro aplicavel, avalia todos os incidentes historicos.
+    """
+    colunas, linhas = db.run_select(
+        "SELECT i.incidente_id, i.tipo, i.severidade, i.tatica_mitre, i.data_abertura, "
+        "a.ambiente, a.criticidade, a.sistema_operacional, a.exposto_internet "
+        "FROM incidentes i JOIN ativos a ON i.ativo_id = a.ativo_id"
+    )
+    registros = [dict(zip(colunas, linha, strict=True)) for linha in linhas]
+    consulta_n = ml.normalizar(consulta)
+
+    filtros: dict[str, list[str]] = {}
+
+    def _casar(campo: str) -> list[str]:
+        valores = sorted({str(r[campo]) for r in registros if r[campo] is not None})
+        return [v for v in valores if ml.normalizar(v) in consulta_n]
+
+    for campo in ("tipo", "severidade", "ambiente"):
+        if achados := _casar(campo):
+            filtros[campo] = achados
+    taticas = _casar("tatica_mitre")
+    so_expostos = "exposto" in consulta_n or "internet" in consulta_n
+
+    selecionados = [
+        r
+        for r in registros
+        if ("tipo" not in filtros or r["tipo"] in filtros["tipo"])
+        and ("severidade" not in filtros or r["severidade"] in filtros["severidade"])
+        and ("ambiente" not in filtros or r["ambiente"] in filtros["ambiente"])
+        and (not taticas or str(r["tatica_mitre"]) in taticas)
+        and (not so_expostos or r["exposto_internet"] == "Sim")
+    ]
+    if not selecionados:  # filtro citado nao existe no historico
+        trace.append(
+            {"tipo": "ml", "filtro": filtros or "nenhum", "incidentes": 0, "prob_media": None}
+        )
+        return (
+            "Previsao ML: nenhum incidente historico casa com os filtros da pergunta "
+            "(valores inexistentes no historico). Sugira ao analista conferir tipo/severidade."
+        )
+    if len(selecionados) > 200:  # guarda: analisa os 200 mais recentes
+        selecionados = sorted(selecionados, key=lambda r: str(r["data_abertura"]))[-200:]
+
+    previsoes = ml.prever_falso_positivo(selecionados)
+    probs = [p["probabilidade_fp"] for p in previsoes]
+    prob_media = sum(probs) / len(probs)
+
+    # agregacao por severidade para leitura rapida
+    por_sev: dict[str, list[float]] = {}
+    id_para_prob = {p["incidente_id"]: p["probabilidade_fp"] for p in previsoes}
+    for r in selecionados:
+        por_sev.setdefault(str(r["severidade"]), []).append(id_para_prob[str(r["incidente_id"])])
+    linha_sev = ", ".join(
+        f"{sev}: {sum(vs) / len(vs) * 100:.0f}% (n={len(vs)})"
+        for sev, vs in sorted(por_sev.items(), key=lambda kv: -sum(kv[1]) / len(kv[1]))
+    )
+    top5 = ", ".join(
+        f"{p['incidente_id']} ({p['probabilidade_fp'] * 100:.0f}%)" for p in previsoes[:5]
+    )
+    desc_filtro = "; ".join(f"{k}={v}" for k, v in filtros.items()) or "todos os incidentes"
+    meta = ml.metricas_fp()
+
+    log.info(
+        "ml.predicted incidentes=%d prob_media=%.3f filtros=%s",
+        len(previsoes),
+        prob_media,
+        desc_filtro,
+    )
+    trace.append(
+        {
+            "tipo": "ml",
+            "filtro": desc_filtro,
+            "incidentes": len(previsoes),
+            "prob_media": round(prob_media * 100, 1),
+        }
+    )
+    return (
+        f"Previsão do modelo de ML (falso positivo) sobre {len(previsoes)} incidentes "
+        f"[filtro: {desc_filtro}]:\n"
+        f"- Probabilidade média de falso positivo: {prob_media * 100:.0f}%\n"
+        f"- Por severidade: {linha_sev}\n"
+        f"- Incidentes mais prováveis de serem falso positivo: {top5}\n"
+        f"- Métricas do modelo em holdout: acurácia {meta.get('acuracia', '-')}%, "
+        f"F1 {meta.get('f1', '-')}%, AUC {meta.get('auc', '-')}% "
+        f"(teto de Bayes {meta.get('teto_bayes_auc', '-')}%)\n"
+        "- Interpretação: use a previsão para PRIORIZAR a revisão; a decisão final "
+        "de fechar como falso positivo é do analista, com evidência registrada."
+    )
+
+
 class AgenteSOC:
     """Agente conversacional com rastreabilidade total das ferramentas usadas."""
 
@@ -406,14 +512,30 @@ class AgenteSOC:
                 except (ValueError, KeyError):
                     rota2 = {"acao": "direto"}
             if rota2.get("acao") == "direto":
-                rota = {
-                    "acao": "consultar",
-                    "ferramentas": [{"tipo": "rag", "consulta": pergunta_efetiva}],
-                }
-                trace.append(
-                    {"tipo": "direto", "decisao": "rota corrigida para RAG pela guarda de domínio"}
-                )
-                log.info("route.guard forcou rag")
+                if _RE_PREVISAO_FP.search(pergunta_efetiva):
+                    rota = {
+                        "acao": "consultar",
+                        "ferramentas": [{"tipo": "ml", "consulta": pergunta_efetiva}],
+                    }
+                    trace.append(
+                        {
+                            "tipo": "direto",
+                            "decisao": "rota corrigida para ML pela guarda de domínio",
+                        }
+                    )
+                    log.info("route.guard forcou ml (intencao de previsao de falso positivo)")
+                else:
+                    rota = {
+                        "acao": "consultar",
+                        "ferramentas": [{"tipo": "rag", "consulta": pergunta_efetiva}],
+                    }
+                    trace.append(
+                        {
+                            "tipo": "direto",
+                            "decisao": "rota corrigida para RAG pela guarda de domínio",
+                        }
+                    )
+                    log.info("route.guard forcou rag")
             else:
                 rota = rota2
                 log.info(
@@ -445,6 +567,10 @@ class AgenteSOC:
                     elif tipo == "rag":
                         partes.append(
                             _executar_rag(str(ferramenta.get("consulta", pergunta_efetiva)), trace)
+                        )
+                    elif tipo == "ml":
+                        partes.append(
+                            _executar_ml(str(ferramenta.get("consulta", pergunta_efetiva)), trace)
                         )
             except Exception as exc:  # falha isolada nao derruba a resposta
                 log.warning("tool.failed tipo=%s erro=%s", tipo, exc)
