@@ -294,6 +294,37 @@ div[data-testid="stChatInput"] button:hover {background: var(--ouro-hover) !impo
 .hero-mark {margin-bottom: 18px;
   filter: drop-shadow(0 0 26px rgba(245,184,0,.28));}
 .hero-mark svg {display: block;}
+/* Controles de colapso/expansao da sidebar — sempre visiveis e estilizados */
+[data-testid="stSidebarCollapseButton"] {visibility: visible !important; opacity: 1 !important;}
+[data-testid="stSidebarCollapseButton"] button {
+  color: var(--text-3) !important; border-radius: 7px !important; padding: 5px !important;}
+[data-testid="stSidebarCollapseButton"] button:hover {
+  color: var(--ouro) !important; background: var(--surface-2) !important;}
+[data-testid="stSidebarCollapsedControl"] {
+  visibility: visible !important; opacity: 1 !important; z-index: 1000 !important;
+  margin: 10px 0 0 10px !important;}
+[data-testid="stSidebarCollapsedControl"] button {
+  background: var(--deep) !important; border: 1px solid var(--bd-strong) !important;
+  border-radius: 9px !important; padding: 7px !important; color: var(--ouro) !important;
+  box-shadow: 0 6px 18px -8px rgba(0,0,0,.7) !important;}
+[data-testid="stSidebarCollapsedControl"] button:hover {
+  border-color: rgba(245,184,0,.5) !important; color: var(--ouro-hover) !important;}
+body:has(section[data-testid="stSidebar"][aria-expanded="false"]) .appbar {padding-left: 64px;}
+/* Sidebar colapsada: o botao de reabrir fica FIXO no canto sup-esq, dourado */
+section[data-testid="stSidebar"][aria-expanded="false"] {
+  transform: none !important; width: 0 !important; min-width: 0 !important;
+  overflow: visible !important;}
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarContent"] {
+  visibility: hidden;}
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarCollapseButton"] {
+  position: fixed !important; left: 10px !important; top: 10px !important;
+  z-index: 2000 !important; transform: none !important;}
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarCollapseButton"] button {
+  background: var(--deep) !important; border: 1px solid var(--bd-strong) !important;
+  border-radius: 9px !important; color: var(--ouro) !important; padding: 7px !important;
+  box-shadow: 0 6px 18px -8px rgba(0,0,0,.7) !important;}
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarCollapseButton"] button:hover {
+  border-color: rgba(245,184,0,.55) !important; color: var(--ouro-hover) !important;}
 </style>
 """
 
