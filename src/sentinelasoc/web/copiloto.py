@@ -167,8 +167,16 @@ def render() -> None:
             placeholder = st.empty()
             texto = ""
             inicio = time.perf_counter()
+            trace_desta_resposta: list[dict] = []
             try:
+                primeiro = True
                 for chunk in agente.answer(pergunta, history, st.session_state.perfil_fatos):
+                    if primeiro:
+                        # AgenteSOC e compartilhado entre sessoes (cache_resource):
+                        # fixa a referencia do rastro DESTA resposta antes que outra
+                        # sessao concorrente rebinde agente.last_trace.
+                        trace_desta_resposta = agente.last_trace
+                        primeiro = False
                     texto += chunk
                     placeholder.markdown(texto + " ▍", unsafe_allow_html=True)
             except Exception as exc:  # erro visivel para o analista
@@ -185,17 +193,17 @@ def render() -> None:
             )
             placeholder.markdown(texto, unsafe_allow_html=True)
             st.session_state.mensagens.append(
-                {"role": "assistant", "content": texto, "trace": agente.last_trace}
+                {"role": "assistant", "content": texto, "trace": trace_desta_resposta}
             )
             with st.expander("Detalhes da execução", expanded=False):
-                _renderizar_trace(agente.last_trace)
+                _renderizar_trace(trace_desta_resposta)
 
         # persistencia episodica + aprendizado semantico
         if st.session_state.conversa_id is None:
             st.session_state.conversa_id = memory.nova_conversa(pergunta)
         cid = st.session_state.conversa_id
         memory.salvar_mensagem(cid, "user", pergunta)
-        memory.salvar_mensagem(cid, "assistant", texto, agente.last_trace)
+        memory.salvar_mensagem(cid, "assistant", texto, trace_desta_resposta)
         if memory.contar_trocas(cid) % 2 == 0:
             fatos = agente.extrair_fatos(pergunta, texto)
             if fatos and memory.atualizar_fatos(fatos):

@@ -208,7 +208,7 @@ div[data-testid="stChatInput"] {border: none; background: transparent;}
 .tk-ctx {background: rgba(124,183,255,.12); color: var(--azul);}
 .tk-retry {background: rgba(255,178,135,.14); color: var(--coral);}
 .tk-erro {background: rgba(250,127,170,.14); color: var(--rosa);}
-.tk-agente {background: rgba(124,183,255,.13); color: var(--azul);}
+.tk-agente {background: rgba(245,184,0,.10); color: var(--ouro-hover);}
 .tk-meta {background: var(--surface-2); color: var(--text-3);}
 .trace-row .v {color: var(--text-2); word-break: break-word; line-height: 1.5;}
 
