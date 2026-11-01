@@ -1,9 +1,10 @@
 """Shell da interface: design system, app bar e navegacao.
 
-Identidade derivada do sistema Sentry (data-dense dark): canvas roxo-preto quente
-(nunca cinza neutro), bordas roxas, acento lima como cor de sinal, rotulos micro
-em caixa alta com letter-spacing, botoes tateis com sombra interna e densidade de
-ferramenta profissional. Fontes auto-hospedadas (base64) — sem CDN.
+Identidade data-dense dark: canvas negro quente (nunca cinza neutro), superficies
+e bordas em marrom quente, ouro como unica cor de sinal, rotulos micro em caixa
+alta com letter-spacing, botoes tateis com sombra interna. Os tokens aqui sao a
+fonte unica da paleta e `.streamlit/config.toml` espelha os quatro que o tema
+nativo do Streamlit usa para pintar o cromo que o CSS nao alcanca.
 """
 
 import streamlit as st
@@ -21,14 +22,18 @@ NAV = [
 
 CSS = """
 <style>
+/* Paleta unica, quente (ouro sobre negro). Nenhum token pode ser declarado duas
+   vezes: a segunda declaracao vence em silencio e vaza uma cor de papel errado
+   para todo mundo que usa o token. Cores de superficie (--canvas/--deep/--painel)
+   nunca sao usadas como cor de texto, e as de acento (--ouro/--coral/--rosa/
+   --azul/--lilas) nunca como fundo solido. */
 :root {
   --canvas: #07050a;
-  --deep: #140f22;
+  --deep: #140f08;
+  --painel: #241d10;
   --surface-1: rgba(245,184,0,.035);
   --surface-2: rgba(245,184,0,.065);
   --surface-3: rgba(245,184,0,.11);
-  --violeta: #241d10;
-  --violeta-forte: #3a2e12;
   --bd: #363021;
   --bd-strong: #4d4430;
   --text: #f7f4ec;
@@ -40,7 +45,7 @@ CSS = """
   --coral: #ffb287;
   --rosa: #fa7faa;
   --azul: #7cb7ff;
-  --violeta: #b7a7f7;
+  --lilas: #b7a7f7;
   --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
   --ui: 'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
@@ -60,11 +65,11 @@ body::before {
     radial-gradient(700px 520px at 108% -8%, rgba(245, 186, 20, .30), transparent 62%),
     radial-gradient(1200px 900px at 104% -4%, rgba(196, 141, 12, .13), transparent 65%),
     radial-gradient(900px 700px at -6% 104%, rgba(245, 186, 20, .08), transparent 60%),
-    #07050a;
+    var(--canvas);
 }
-html, body { background: #07050a !important; }
+html, body { background: var(--canvas) !important; }
 body, .stApp, .main, [class*="css"], [data-testid="stHeader"], header { background: transparent !important; }
-section[data-testid="stSidebar"] { background: #0d0a12 !important; }
+section[data-testid="stSidebar"] { background: var(--deep) !important; }
 #MainMenu, footer, div[data-testid="stToolbar"] {visibility: hidden; height: 0;}
 
 /* ── App bar ─────────────────────────────────────────── */
@@ -166,8 +171,8 @@ section[data-testid="stSidebar"] [data-testid="stButton"] button[kind="secondary
 }
 [data-testid="stChatMessage"] p {font-size: 14px; line-height: 1.66; color: var(--text);}
 [data-testid="stChatMessage"] code {
-  font-family: var(--mono); font-size: 12px; background: var(--violeta);
-  border: 1px solid var(--bd-strong); border-radius: 4px; padding: 1px 5px; color: #e8e4ff;
+  font-family: var(--mono); font-size: 12px; background: var(--painel);
+  border: 1px solid var(--bd-strong); border-radius: 4px; padding: 1px 5px; color: var(--text);
 }
 [data-testid="stChatMessage"] pre {border: 1px solid var(--bd); border-radius: 9px; background: var(--deep);}
 [data-testid="stChatMessage"] table {font-size: 12.5px; border-collapse: collapse;}
@@ -188,9 +193,10 @@ div[data-testid="stChatInput"] {border: none; background: transparent;}
 /* ── Rastro (trace) ──────────────────────────────────── */
 [data-testid="stExpander"] {
   border: 1px solid var(--bd-strong) !important; border-radius: 9px !important;
-  background: var(--violeta) !important;
+  background: var(--painel) !important;
 }
-[data-testid="stExpander"] summary {padding: 8px 12px !important;}
+[data-testid="stExpander"] summary {padding: 8px 12px !important;
+  background: transparent !important;}
 [data-testid="stExpander"] summary:hover {background: var(--surface-2) !important;
   border-radius: 9px !important;}
 [data-testid="stExpander"] summary p {font-family: var(--mono); font-size: 11px;
@@ -198,18 +204,18 @@ div[data-testid="stChatInput"] {border: none; background: transparent;}
 .trace-row {
   display: flex; gap: 10px; align-items: baseline;
   font-family: var(--mono); font-size: 11px; padding: 3px 0;
-  border-bottom: 1px dashed rgba(139,116,255,.12);
+  border-bottom: 1px dashed var(--bd);
 }
 .trace-row .k {flex: 0 0 72px; text-align: center; border-radius: 4px; padding: 1px 0;
   font-size: 9.5px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;}
 .tk-sql {background: rgba(124,183,255,.14); color: var(--azul);}
 .tk-rag {background: rgba(245,184,0,.14); color: var(--ouro);}
-.tk-ml {background: rgba(183,167,247,.15); color: var(--violeta);}
+.tk-ml {background: rgba(183,167,247,.15); color: var(--lilas);}
 .tk-ctx {background: rgba(124,183,255,.12); color: var(--azul);}
 .tk-retry {background: rgba(255,178,135,.14); color: var(--coral);}
 .tk-erro {background: rgba(250,127,170,.14); color: var(--rosa);}
 .tk-agente {background: rgba(245,184,0,.10); color: var(--ouro-hover);}
-.tk-meta {background: var(--surface-2); color: var(--text-3);}
+.tk-meta {background: var(--surface-2); color: var(--text-2);}
 .trace-row .v {color: var(--text-2); word-break: break-word; line-height: 1.5;}
 
 /* ── Metricas ────────────────────────────────────────── */
@@ -258,9 +264,9 @@ a {color: var(--ouro-hover);}
 /* Scrollbars finas escuras */
 *::-webkit-scrollbar {width: 9px; height: 9px;}
 *::-webkit-scrollbar-track {background: transparent;}
-*::-webkit-scrollbar-thumb {background: #2b2415; border-radius: 8px; border: 2px solid #07050a;}
+*::-webkit-scrollbar-thumb {background: #2b2415; border-radius: 8px; border: 2px solid var(--canvas);}
 *::-webkit-scrollbar-thumb:hover {background: #443821;}
-html {scrollbar-color: #2b2415 #07050a; scrollbar-width: thin;}
+html {scrollbar-color: #2b2415 var(--canvas); scrollbar-width: thin;}
 ::selection {background: rgba(245,184,0,.30); color: #fff;}
 @keyframes msg-in {from {opacity: 0; transform: translateY(6px);} to {opacity: 1; transform: none;}}
 [data-testid="stChatMessage"] {animation: msg-in .26s ease both;}
@@ -276,7 +282,7 @@ html {scrollbar-color: #2b2415 #07050a; scrollbar-width: thin;}
 [data-testid="stChatMessage"] hr {border: none; border-top: 1px solid var(--bd); margin: 14px 0;}
 [data-testid="stChatMessage"] strong {color: var(--text); font-weight: 600;}
 div[data-testid="stChatInput"] {
-  background: #0d0a12; border: 1px solid var(--bd-strong); border-radius: 12px;
+  background: var(--deep); border: 1px solid var(--bd-strong); border-radius: 12px;
   padding: 6px 8px 6px 14px; box-shadow: 0 10px 28px -14px rgba(0,0,0,.65);
   transition: border-color .15s ease, box-shadow .15s ease;}
 div[data-testid="stChatInput"]:focus-within {
@@ -293,7 +299,7 @@ div[data-testid="stChatInput"] button:hover {background: var(--ouro-hover) !impo
   text-align: center; font-family: var(--mono); font-size: 10px;
   color: var(--text-3); letter-spacing: .08em; margin-top: 8px; text-transform: uppercase;}
 [data-testid="stStatus"] {
-  background: var(--surface-1) !important; border: 1px solid var(--bd) !important;
+  background: var(--painel) !important; border: 1px solid var(--bd-strong) !important;
   border-radius: 9px !important;}
 .hero-mark {margin-bottom: 18px;
   filter: drop-shadow(0 0 26px rgba(245,184,0,.28));}

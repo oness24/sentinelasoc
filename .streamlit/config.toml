@@ -1,9 +1,12 @@
+# Espelha os tokens de src/sentinelasoc/web/shell.py: o tema nativo do Streamlit
+# pinta o cromo que o CSS nao alcanca (foco, spinner, selecao, cabecalho de
+# status). Divergir daqui faz a interface exibir duas paletas ao mesmo tempo.
 [theme]
 base = "dark"
-primaryColor = "#00d492"
-backgroundColor = "#0e1117"
-secondaryBackgroundColor = "#171c26"
-textColor = "#e8eef2"
+primaryColor = "#f5b800"
+backgroundColor = "#07050a"
+secondaryBackgroundColor = "#241d10"
+textColor = "#f7f4ec"
 
 [server]
 headless = true
