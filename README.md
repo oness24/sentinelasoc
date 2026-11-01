@@ -80,8 +80,10 @@ dossier handed to the redator is also what the **faithfulness** metric scores ag
 Every production LLM call is logged to a local SQLite diary (`llm_chamadas` table):
 request_id (same id as the logs and the UI trace), agent (triador/redator/sistema),
 pipeline stage, model, tokens when the provider reports them, latency and
-success/failure. The **Observabilidade** page in the UI shows KPIs, per-stage
-latency and recent calls — no data ever leaves the machine.
+success/failure. The **Observabilidade** page in the UI shows KPIs, per-stage latency and recent
+calls — no data ever leaves the machine.
+
+![Observabilidade — LLM call diary](docs/assets/screenshot-observabilidade.png)
 
 Stack: **Python 3.11+ · Streamlit · DuckDB · ChromaDB · sentence-transformers ·
 OpenAI-compatible LLM API** (OpenAI, OpenRouter, Groq, Ollama, vLLM — anything that
