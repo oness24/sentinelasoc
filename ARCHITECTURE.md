@@ -38,6 +38,8 @@ flowchart LR
 | 9 | **Reescrita de seguimentos antes de rotear** | passar o histórico cru às ferramentas | Follow-ups viram perguntas autônomas (auditáveis no trace) antes de SQL/RAG — padrão consolidado de RAG conversacional |
 | 10 | **Recuperação híbrida (vetores + BM25, fusão RRF)** | apenas vetores | Embeddings borram identificadores exatos (T1566, '15/2024', KEV); BM25 cobre o léxico e a fusão reciprocal rank soma os dois (hit@1 93%→100% no golden ampliado). Índice lazy espelhado do ChromaDB, degradação graciosa |
 | 11 | **ML como ferramenta determinística do roteador** (`ml`) | LLM "prever" na resposta final; endpoint de modelo separado | O classificador (scikit-learn, artefato joblib regenerável por seed) roda local e determinístico; o LLM só interpreta. Filtro por tipo/severidade/ambiente é casamento lexical sem LLM (auditável), e a métrica do modelo acompanha a resposta — o teto de Bayes do rótulo é publicado em `evals/report_ml.md` para separar modelo fraco de problema ruidoso |
+| 12 | **Crew de 2 agentes especializados no mesmo chat** (Triador + Redator) | agente monolítico; framework CrewAI/LangGraph | O **AgenteTriador** decide e coleta evidências (RAG/SQL/ML, com reescrita e guardas); o **AgenteRedator** recebe o dossiê + guardrails de redação e produz a resposta. Equivalência CrewAI (papéis, objetivo, backstory, entrega entre agentes) sem dependência externa; a entrega é um evento auditável no rastro (`tipo: agente`). Orquestração leve em `crew.py` — cada fase rotulada para a instrumentação |
+| 13 | **Instrumentação local em SQLite** (Langfuse-equivalente) | Langfuse/LangSmith SaaS; apenas logs de texto | O cliente LLM de produção registra TODA chamada no diário `llm_chamadas` (request_id correlacionado aos logs, agente/etapa via contextvars, tokens quando o provedor informa, latência, sucesso/falha). Sem dado saindo da máquina — coerente com a premissa 100% local; painel "Observabilidade" na UI |
 
 ## Modelo de dados
 
@@ -51,6 +53,32 @@ determinística (seed fixa) por `scripts/generate_data.py`:
 Distribuições são intencionalmente enviesadas para refletir realidade de SOC
 (expostos em DMZ concentram mais incidentes; falsos positivos correlacionam com
 severidade baixa), tornando consultas analíticas interessantes.
+
+## Crew de agentes (Etapa 2)
+
+Dois agentes especializados operam **no mesmo chat** (`src/sentinelasoc/crew.py`), padrão
+CrewAI-equivalente — cada um com papel, objetivo e prompt próprios, e uma entrega
+explícita entre eles:
+
+```mermaid
+flowchart LR
+    U[Analista] --> T["AGENTE TRIADOR (evidências)"]
+    T -->|reescrita de seguimento| T
+    T -->|decisão JSON temp 0| RT{RAG · SQL · ML}
+    RT -->|dossiê de evidências| R["AGENTE REDATOR (resposta)"]
+    R -->|guardrails: fontes citadas, sem sistemas externos, fluxos separados| F[Resposta final com streaming]
+    T -.->|social/trivial| D[resposta direta]
+```
+
+| Agente | Papel | Ferramenta | Prompt |
+|---|---|---|---|
+| **Triador** (`AgenteTriador`) | decidir E coletar as evidências: reescreve seguimentos, roteia (RAG/SQL/ML), aplica guardas de domínio e executa as ferramentas | RAG, SQL, ML, reescrita | `TRIADOR_PROMPT` |
+| **Redator** (`AgenteRedator`) | transformar o dossiê em resposta ao analista, sob guardrails de redação (fonte citada, sem sistemas externos, fluxos vuln≠incidente, LGPD, honestidade numérica) | memória de longo prazo | `REDATOR_PROMPT` + `SYSTEM_PROMPT` |
+
+Equivalência CrewAI: `role/goal/backstory` = prompts especializados; `task` = coleta e
+redação; `process` sequencial = orquestração explícita em `EquipeSOC.answer`. A entrega
+triador→redator é um evento de rastro (`tipo: agente`), visível na UI em "Detalhes da
+execução". Conversa social é respondida pelo próprio triador (1 chamada de LLM).
 
 ## Segurança — modelo de ameaças
 
@@ -86,3 +114,15 @@ tamanho. Em produção a recuperação usa top-4, e ambos os modelos avaliados a
 - Cada resposta carrega um trace com tempos por etapa (roteamento, ferramenta, SQL),
   exibido na UI no painel "Rastro da resposta" — latência e custo de cada camada
   ficam visíveis para o analista e para o desenvolvedor.
+- **Diário de chamadas LLM** (`instrumentacao.py`, Etapa 2): toda chamada do cliente
+  OpenAI-compatível é gravada na tabela `llm_chamadas` (SQLite, `sentinelasoc.db`) com
+  request_id (correlacionado aos logs), agente (triador/redator/sistema), etapa do
+  pipeline, modelo, tokens (quando o provedor informa; streaming não expõe), latência
+  e sucesso/falha. O papel/etapa correntes viajam em contextvars — nenhuma chamada
+  escapa, e falhas de gravação nunca derrubam a resposta.
+- **Painel "Observabilidade"** na UI: KPIs (volume, sucesso, latência, tokens),
+  quebra por agente+etapa e chamadas recentes por request_id — o equivalente local
+  de um dashboard Langfuse, sem dado saindo da máquina.
+- **Avaliação como observabilidade de qualidade**: `evals/report_e2e.md` agora inclui
+  métricas DeepEval-equivalente (faithfulness, answer relevancy, SQL correctness) e a
+  tendência entre execuções (`evals/historico_e2e.json`).

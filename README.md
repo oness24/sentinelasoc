@@ -43,15 +43,16 @@ mean predicted probability, and per-stage latency. No black-box answers.
 ```mermaid
 flowchart LR
     U[Analyst] --> UI[Streamlit chat\nstreaming · session state]
-    UI --> AG[AgenteSOC]
-    AG --> RT{Router LLM\nJSON, temp 0}
+    UI --> T[Agent TRIADOR\ncrew.py · evidence collector]
+    T --> RT{Router LLM\nJSON, temp 0}
     RT -->|policy / procedure| RAG[ChromaDB RAG\ndocs/*.md · 48 chunks]
     RT -->|numbers / trends| SQL[NL → SQL generator\n+ read-only guard]
     RT -->|FP risk / triage| ML[FP predictor\nscikit-learn · joblib]
     RT -->|small talk| D[Direct answer]
-    RAG --> FIN[Final answer\nstreaming · citations]
-    SQL --> FIN
-    ML --> FIN
+    RAG --> R[Agent REDATOR\nguardrails · citations]
+    SQL --> R
+    ML --> R
+    R --> FIN[Final answer\nstreaming · citations]
     FIN --> UI
     subgraph Data layer
       CSV[(3 related CSVs)] --> DUCK[(DuckDB)]
@@ -60,6 +61,27 @@ flowchart LR
 ```
 
 Full decisions, data model and **threat model** in [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Agent crew (two specialists, same chat)
+
+Since v1.2.0 the pipeline is a **CrewAI-equivalent crew** (`src/sentinelasoc/crew.py`),
+with the handoff between agents visible in every answer's trace panel:
+
+| Agent | Owns | Prompt |
+|---|---|---|
+| **Triador** | evidence: follow-up rewriting, tool routing (RAG/SQL/ML), domain guards, tool execution | `TRIADOR_PROMPT` |
+| **Redator** | the final answer, under drafting guardrails (cite sources, no external systems, vuln ≠ incident flows, LGPD, numbers only from evidence) | `REDATOR_PROMPT` |
+
+Social small-talk is answered by the triador directly (1 LLM call). The evidence
+dossier handed to the redator is also what the **faithfulness** metric scores against.
+
+## LLM observability (local Langfuse-equivalent)
+
+Every production LLM call is logged to a local SQLite diary (`llm_chamadas` table):
+request_id (same id as the logs and the UI trace), agent (triador/redator/sistema),
+pipeline stage, model, tokens when the provider reports them, latency and
+success/failure. The **Observabilidade** page in the UI shows KPIs, per-stage
+latency and recent calls — no data ever leaves the machine.
 
 Stack: **Python 3.11+ · Streamlit · DuckDB · ChromaDB · sentence-transformers ·
 OpenAI-compatible LLM API** (OpenAI, OpenRouter, Groq, Ollama, vLLM — anything that
@@ -161,21 +183,35 @@ questions):
 BM25 index is built lazily from the ChromaDB collection (invalidated on re-ingest) and
 degrades gracefully to vector-only if unavailable.
 
-### End-to-end (final answers, LLM-as-judge)
+### End-to-end (final answers, LLM-as-judge + DeepEval-equivalente metrics)
 
-`python evals/evaluate_e2e.py --runs 3` runs the **full agent** (routing → tools → answer)
-on 10 golden questions, 3 runs each. A local-LLM judge (temperature 0) scores fact
-coverage and hallucination; SQL answers are verified against reference queries executed
-live (`evals/report_e2e.md`):
+`python evals/evaluate_e2e.py --runs 3` runs the **full agent crew** (routing →
+tools → redator) on 10 golden questions, 3 runs each. A local-LLM judge
+(temperature 0) scores fact coverage and hallucination; SQL answers are verified
+against reference queries executed live (`evals/report_e2e.md`):
 
-| Metric | Result (3-run mean) |
+| Metric | Result (3-run mean, latest execution) |
 |---|---|
-| Fact coverage | 86% |
-| Correct routing | 90% |
+| Fact coverage | 79% |
+| Correct routing | 80% |
 | Correct document citation | 100% |
 | Hallucination rate | 0% |
-| Judge score (1–5) | 4.5 |
-| Latency per answer | ~4.6s |
+| Judge score (1–5) | 4.2 |
+| Latency per answer | ~6.3s |
+
+Across consecutive executions (`evals/historico_e2e.json`, rendered as a trend table in
+the report) the DeepEval-equivalente metrics are stable while coverage oscillates a few
+points — the documented variance of a local 7B on ambiguous aggregates.
+
+On top of the judge, the harness now computes **DeepEval-equivalente metrics** with
+market-standard names, per case and as run means, plus a **trend across runs**
+(`evals/historico_e2e.json`):
+
+| Metric | Definition | Latest run |
+|---|---|---|
+| **Faithfulness** | share of the answer's factual claims supported by the retrieved evidence dossier | 98% (99% previous) |
+| **Answer relevancy** | how directly the answer addresses the question (0–1) | 98% (97% previous) |
+| **SQL correctness** | generated query result == reference query result, both executed live | 100% |
 
 Running this harness against a 7B model surfaced real failure modes, fixed with
 deterministic guards (all unit-tested): ratio-scope lints for rate questions,
@@ -215,8 +251,8 @@ Threat model with attack vectors and mitigations: [ARCHITECTURE.md](ARCHITECTURE
 ## Testing & CI
 
 ```bash
-make test          # unit — 28 tests, no network, no keys (FakeLLM via DI)
-make test-all      # + integration (embeddings, index) — 37 total
+make test          # unit — 80 tests, no network, no keys (FakeLLM via DI)
+make test-all      # + integration (embeddings, index) — 85 total
 make lint typecheck  # ruff + mypy
 ```
 
@@ -226,8 +262,9 @@ job runs the RAG suite locally-seeded.
 ## Roadmap
 
 - [x] False-positive classifier for incident triage (`ml` tool — `evals/report_ml.md`)
-- [ ] Specialized agent crew: evidence collector + drafter in the same chat
-- [ ] LLM-call observability panel (latency, tokens, retries per request)
+- [x] Specialized agent crew: evidence collector + drafter in the same chat (`crew.py`)
+- [x] LLM-call observability: SQLite diary + Observabilidade dashboard
+- [x] DeepEval-equivalente metrics (faithfulness, relevancy, SQL correctness) + run trend
 - [ ] Prompt-injection red-team corpus in the eval harness
 - [ ] Optional auth layer (OIDC) for multi-user deployments
 

@@ -1,0 +1,28 @@
+[
+ {
+  "data": "2026-11-01T10:30-03:00",
+  "runs": 3,
+  "casos": 10,
+  "cobertura": 0.828,
+  "roteamento": 0.8,
+  "alucinacao": 0.0,
+  "nota": 4.37,
+  "latencia": 6.8,
+  "faithfulness": 0.992,
+  "relevancia": 0.967,
+  "sql_corretude": 1.0
+ },
+ {
+  "data": "2026-11-01T10:37-03:00",
+  "runs": 3,
+  "casos": 10,
+  "cobertura": 0.795,
+  "roteamento": 0.8,
+  "alucinacao": 0.0,
+  "nota": 4.2,
+  "latencia": 6.3,
+  "faithfulness": 0.982,
+  "relevancia": 0.983,
+  "sql_corretude": 1.0
+ }
+]

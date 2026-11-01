@@ -14,12 +14,13 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-from sentinelasoc.web import copiloto, memoria, painel  # noqa: E402
+from sentinelasoc.web import copiloto, memoria, observabilidade, painel  # noqa: E402
 from sentinelasoc.web.shell import inject_css, sidebar_shell  # noqa: E402
 
 PAGINAS = {
     "copiloto": ("Copiloto", copiloto.render),
     "painel": ("Painel", painel.render),
+    "observabilidade": ("Observabilidade", observabilidade.render),
     "memoria": ("Memória", memoria.render),
 }
 

@@ -91,6 +91,11 @@ def request_context() -> Iterator[str]:
         _request_id.reset(token)
 
 
+def request_id_corrente() -> str:
+    """request_id vigente (ou '—' fora de requisicao) — usado pela instrumentacao."""
+    return _request_id.get()
+
+
 @contextmanager
 def timed(label: str, trace: list[dict] | None = None) -> Iterator[None]:
     """Registra duracao de uma etapa; opcionalmente anexa ao trace da resposta."""

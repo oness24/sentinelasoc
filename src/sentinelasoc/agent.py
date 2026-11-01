@@ -6,6 +6,9 @@ Design:
   fontes RAG, tempos por etapa e falhas de ferramenta.
 - Falha em uma ferramenta nao derruba a resposta: o erro entra no contexto e o
   LLM final responde com a limitacao explicita.
+- A partir da Etapa 2, o fluxo de resposta e executado por uma tripulacao de dois
+  agentes especializados (triador coleta evidencias; redator redige com guardrails)
+  — ver crew.py. O AgenteSOC mantem a API historica e o rastro.
 """
 
 import json
@@ -14,15 +17,8 @@ from collections.abc import Iterator
 
 from sentinelasoc import db, ml, rag
 from sentinelasoc.llm import LLMClient, OpenAILLMClient
-from sentinelasoc.prompts import (
-    FACTS_PROMPT,
-    FINAL_PROMPT,
-    REWRITE_PROMPT,
-    ROUTER_PROMPT,
-    SQL_PROMPT,
-    SYSTEM_PROMPT,
-)
-from sentinelasoc.telemetry import get_logger, request_context, timed
+from sentinelasoc.prompts import FACTS_PROMPT, REWRITE_PROMPT, SQL_PROMPT
+from sentinelasoc.telemetry import get_logger, request_context
 
 log = get_logger(__name__)
 MAX_HISTORIA = 6
@@ -370,6 +366,7 @@ class AgenteSOC:
     def __init__(self, llm: LLMClient | None = None) -> None:
         self.llm = llm
         self.last_trace: list[dict] = []
+        self.last_contexto: str = ""  # dossie de evidencias da ultima resposta
 
     def _cliente(self) -> LLMClient:
         if self.llm is None:
@@ -389,6 +386,7 @@ class AgenteSOC:
         """
         history = history or []
         self.last_trace = []
+        self.last_contexto = ""
         trace = self.last_trace
         cliente = self._cliente()
 
@@ -403,24 +401,27 @@ class AgenteSOC:
 
     def extrair_fatos(self, pergunta: str, resposta: str) -> list[str]:
         """Extrai fatos duraveis sobre o analista de uma troca (memoria semantica)."""
+        from sentinelasoc.instrumentacao import contexto_llm
+
         cliente = self._cliente()
         try:
-            plano = extrair_json(
-                cliente.complete(
-                    [
-                        {
-                            "role": "system",
-                            "content": FACTS_PROMPT.format(
-                                pergunta=pergunta[:800], resposta=resposta[:1500]
-                            ),
-                        },
-                        {"role": "user", "content": "extrair"},
-                    ],
-                    temperature=0.0,
-                    max_tokens=400,
-                    json_mode=True,
+            with contexto_llm(agente="sistema", etapa="memoria_fatos"):
+                plano = extrair_json(
+                    cliente.complete(
+                        [
+                            {
+                                "role": "system",
+                                "content": FACTS_PROMPT.format(
+                                    pergunta=pergunta[:800], resposta=resposta[:1500]
+                                ),
+                            },
+                            {"role": "user", "content": "extrair"},
+                        ],
+                        temperature=0.0,
+                        max_tokens=400,
+                        json_mode=True,
+                    )
                 )
-            )
             fatos = [str(f).strip() for f in plano.get("fatos", []) if str(f).strip()]
             log.info("memory.facts.extracted n=%d", len(fatos))
             return fatos[:4]
@@ -436,159 +437,13 @@ class AgenteSOC:
         cliente: LLMClient,
         perfil: list[str] | None = None,
     ) -> Iterator[str]:
-        # 0) Seguimentos: reescreve a pergunta em forma autonoma
-        pergunta_efetiva = pergunta
-        if history:
-            with timed("reformulacao", trace):
-                try:
-                    pergunta_efetiva = _reformular(pergunta, history, cliente)
-                except (ValueError, KeyError) as exc:
-                    log.warning("rewrite.failed erro=%s", exc)
-            if pergunta_efetiva != pergunta:
-                trace.append(
-                    {"tipo": "contexto", "seguimento": True, "reescrita": pergunta_efetiva}
-                )
-                log.info("rewrite.done pergunta=%r -> %r", pergunta, pergunta_efetiva[:100])
+        """Delega o fluxo a tripulacao (crew): triador coleta, redator redige.
 
-        # 1) Roteamento (sem streaming, temperatura 0, JSON estrito)
-        with timed("roteamento", trace):
-            try:
-                rota = extrair_json(
-                    cliente.complete(
-                        [
-                            {"role": "system", "content": ROUTER_PROMPT},
-                            *_historico_mensagens(history),
-                            {"role": "user", "content": pergunta_efetiva},
-                        ],
-                        temperature=0.0,
-                        json_mode=True,
-                    )
-                )
-            except (ValueError, KeyError) as exc:
-                # roteamento mal-sucedido: degrada com mensagem util em vez de estourar
-                log.warning("route.failed erro=%s", exc)
-                trace.append({"tipo": "erro", "detalhe": f"roteamento: {exc}"})
-                yield (
-                    "Nao consegui estruturar a consulta agora. "
-                    "Tente reformular a pergunta (ex.: cite o tipo de incidente ou o documento)."
-                )
-                return
+        A orquestracao de dois agentes especializados vive em crew.py; este metodo
+        mantem a API historica do AgenteSOC (UI, avaliacoes e testes nao mudam).
+        """
+        from sentinelasoc.crew import AgenteRedator, AgenteTriador, EquipeSOC
 
-        log.info(
-            "route.decided acao=%s ferramentas=%s",
-            rota.get("acao"),
-            [f.get("tipo") for f in rota.get("ferramentas", [])],
-        )
-
-        # 1b) Guarda de dominio: pergunta de seguranca jamais responde 'direto'
-        # (o roteador 7B varia entre execucoes; a guarda e deterministica).
-        if rota.get("acao") == "direto" and _RE_DOMINIO.search(pergunta_efetiva):
-            log.info("route.guard dominio=true acao=direto — reconsultando")
-            trace.append(
-                {
-                    "tipo": "retry",
-                    "detalhe": "rota 'direto' em pergunta de domínio — reconsultando roteador",
-                }
-            )
-            with timed("roteamento-guarda", trace):
-                try:
-                    rota2 = extrair_json(
-                        cliente.complete(
-                            [
-                                {"role": "system", "content": ROUTER_PROMPT},
-                                {
-                                    "role": "user",
-                                    "content": (
-                                        f"{pergunta_efetiva}\n\n"
-                                        "ATENCAO: esta pergunta e do dominio de seguranca "
-                                        'e EXIGE ferramentas. Nao use "direto".'
-                                    ),
-                                },
-                            ],
-                            temperature=0.0,
-                            json_mode=True,
-                        )
-                    )
-                except (ValueError, KeyError):
-                    rota2 = {"acao": "direto"}
-            if rota2.get("acao") == "direto":
-                if _RE_PREVISAO_FP.search(pergunta_efetiva):
-                    rota = {
-                        "acao": "consultar",
-                        "ferramentas": [{"tipo": "ml", "consulta": pergunta_efetiva}],
-                    }
-                    trace.append(
-                        {
-                            "tipo": "direto",
-                            "decisao": "rota corrigida para ML pela guarda de domínio",
-                        }
-                    )
-                    log.info("route.guard forcou ml (intencao de previsao de falso positivo)")
-                else:
-                    rota = {
-                        "acao": "consultar",
-                        "ferramentas": [{"tipo": "rag", "consulta": pergunta_efetiva}],
-                    }
-                    trace.append(
-                        {
-                            "tipo": "direto",
-                            "decisao": "rota corrigida para RAG pela guarda de domínio",
-                        }
-                    )
-                    log.info("route.guard forcou rag")
-            else:
-                rota = rota2
-                log.info(
-                    "route.guard corrigido pelo roteador ferramentas=%s",
-                    [f.get("tipo") for f in rota.get("ferramentas", [])],
-                )
-
-        if rota.get("acao") == "direto":
-            trace.append({"tipo": "direto", "decisao": "resposta direta sem ferramentas"})
-            yield rota.get("resposta", "Como posso ajudar na triagem?")
-            return
-
-        # 2) Execucao das ferramentas escolhidas
-        partes: list[str] = []
-        for ferramenta in rota.get("ferramentas", []):
-            tipo = str(ferramenta.get("tipo", ""))
-            try:
-                with timed(f"ferramenta:{tipo}", trace):
-                    if tipo == "sql":
-                        partes.append(
-                            _executar_sql(
-                                str(ferramenta.get("pergunta", pergunta_efetiva)),
-                                trace,
-                                cliente,
-                                history,
-                                original=pergunta_efetiva,
-                            )
-                        )
-                    elif tipo == "rag":
-                        partes.append(
-                            _executar_rag(str(ferramenta.get("consulta", pergunta_efetiva)), trace)
-                        )
-                    elif tipo == "ml":
-                        partes.append(
-                            _executar_ml(str(ferramenta.get("consulta", pergunta_efetiva)), trace)
-                        )
-            except Exception as exc:  # falha isolada nao derruba a resposta
-                log.warning("tool.failed tipo=%s erro=%s", tipo, exc)
-                trace.append({"tipo": "erro", "detalhe": f"{tipo}: {exc}"})
-                partes.append(f"Ferramenta {tipo} falhou: {exc}")
-
-        contexto = "\n\n---\n\n".join(partes) if partes else "Nenhuma ferramenta retornou contexto."
-
-        # 3) Resposta final com streaming (perfil do analista = memoria de longo prazo)
-        system = SYSTEM_PROMPT
-        if perfil:
-            system += (
-                "\n\nMEMORIA DE LONGO PRAZO DO ANALISTA (aprendida em conversas anteriores):\n"
-            )
-            system += "\n".join(f"- {f}" for f in perfil[:12])
-        mensagens = [
-            {"role": "system", "content": system},
-            *_historico_mensagens(history),
-            {"role": "user", "content": FINAL_PROMPT.format(pergunta=pergunta, contexto=contexto)},
-        ]
-        yield from cliente.stream(mensagens)
+        equipe = EquipeSOC(AgenteTriador(cliente), AgenteRedator(cliente))
+        yield from equipe.answer(pergunta, history, trace, cliente, perfil)
+        self.last_contexto = equipe.last_contexto

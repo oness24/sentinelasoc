@@ -54,6 +54,7 @@ def _renderizar_trace(trace: list[dict]) -> None:
         "erro": "tk-erro",
         "tempo": "tk-meta",
         "direto": "tk-meta",
+        "agente": "tk-agente",
     }
     linhas = []
     for item in trace:
@@ -136,11 +137,15 @@ def render() -> None:
                 st.markdown(msg["content"])
         else:
             with st.chat_message("assistant", avatar=AV_ASSISTENTE):
-                req = ""
                 tr = msg.get("trace") or []
+                extra = ""
                 if tr and tr[0].get("id"):
-                    req = f"req {tr[0]['id']}"
-                _meta("SENTINELASOC", req)
+                    extra = f"req {tr[0]['id']}"
+                papeis = [t.get("papel") for t in tr if t.get("tipo") == "agente"]
+                if papeis:
+                    crew = "+".join(dict.fromkeys(papeis))
+                    extra = f"{extra} · {crew}" if extra else crew
+                _meta("SENTINELASOC", extra)
                 st.markdown(msg["content"], unsafe_allow_html=True)
                 if tr:
                     with st.expander("Detalhes da execução", expanded=False):

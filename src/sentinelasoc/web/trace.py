@@ -29,6 +29,9 @@ def formatar_evento(item: dict) -> tuple[str, str] | None:
         return "ml", f"filtro: {filtro} · {item.get('incidentes', 0)} incidentes · FP médio {prev}"
     if tipo == "ctx":
         return "ctx", f"seguimento reformulado → {str(item.get('reescrita', ''))[:90]}"
+    if tipo == "agente":
+        papel = str(item.get("papel", "agente")).upper()
+        return "agente", f"{papel} · {str(item.get('acao', ''))[:90]}"
     if tipo in ("retry", "erro"):
         return tipo, str(item.get("detalhe", ""))[:120]
     if tipo == "direto":

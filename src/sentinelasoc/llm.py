@@ -37,7 +37,11 @@ def _sem_pensamento(texto: str) -> str:
 
 class OpenAILLMClient:
     """Cliente para qualquer provedor compativel com a API OpenAI
-    (OpenAI, OpenRouter, Groq, Together, Ollama, vLLM...), com retry exponencial."""
+    (OpenAI, OpenRouter, Groq, Together, Ollama, vLLM...), com retry exponencial.
+
+    Toda chamada e registrada no diario de instrumentacao (agente/etapa correntes,
+    tokens quando o provedor informa, latencia e sucesso) — ver instrumentacao.py.
+    """
 
     def __init__(self) -> None:
         s = get_settings()
@@ -48,6 +52,24 @@ class OpenAILLMClient:
         self._client = OpenAI(api_key=s.openai_api_key, base_url=s.openai_base_url)
         self.model = s.llm_model
         self._retries = s.llm_max_retries
+
+    def _registrar(self, inicio: float, sucesso: bool, resp=None, erro: str | None = None) -> None:
+        """Grava a chamada no diario; falha de gravacao nao propaga."""
+        from sentinelasoc import instrumentacao
+
+        prompt_tokens = getattr(getattr(resp, "usage", None), "prompt_tokens", None)
+        completion_tokens = getattr(getattr(resp, "usage", None), "completion_tokens", None)
+        agente, etapa = instrumentacao.contexto_corrente()
+        instrumentacao.registrar_chamada(
+            modelo=self.model,
+            duracao_ms=(time.perf_counter() - inicio) * 1000,
+            sucesso=sucesso,
+            agente=agente,
+            etapa=etapa,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            erro=erro,
+        )
 
     def _call_with_retries(
         self,
@@ -88,16 +110,33 @@ class OpenAILLMClient:
         max_tokens: int = 1500,
         json_mode: bool = False,
     ) -> str:
-        resp = self._call_with_retries(
-            messages, temperature, max_tokens, stream=False, json_mode=json_mode
-        )
+        inicio = time.perf_counter()
+        try:
+            resp = self._call_with_retries(
+                messages, temperature, max_tokens, stream=False, json_mode=json_mode
+            )
+        except Exception as exc:
+            self._registrar(inicio, sucesso=False, erro=f"{type(exc).__name__}: {exc}")
+            raise
+        self._registrar(inicio, sucesso=True, resp=resp)
         return _sem_pensamento(resp.choices[0].message.content or "")
 
     def stream(
         self, messages: list[dict], temperature: float = 0.3, max_tokens: int = 1200
     ) -> Iterator[str]:
-        resp = self._call_with_retries(messages, temperature, max_tokens, stream=True)
-        for delta in resp:
-            piece = delta.choices[0].delta.content
-            if piece:
-                yield piece
+        inicio = time.perf_counter()
+        try:
+            resp = self._call_with_retries(messages, temperature, max_tokens, stream=True)
+            yield from _deltas(resp)
+        except Exception as exc:
+            self._registrar(inicio, sucesso=False, erro=f"{type(exc).__name__}: {exc}")
+            raise
+        # streaming OpenAI nao expoe usage: tokens ficam nulos no diario
+        self._registrar(inicio, sucesso=True)
+
+
+def _deltas(resp) -> Iterator[str]:
+    for delta in resp:
+        piece = delta.choices[0].delta.content
+        if piece:
+            yield piece
